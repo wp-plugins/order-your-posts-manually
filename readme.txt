@@ -7,12 +7,12 @@ Tags: database, post, posts, order, manually
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.0
-Tested up to: 3.9.1
-Stable tag: 1.0
-Version: 1.0
+Tested up to: 3.9.2
+Stable tag: 1.1
+Version: 1.1
 
 == Description ==
-This plugin is a simple plugin for ordering your posts by hand
+This plugin is a simple plugin for ordering your posts totally by hand
 
 = Main Features =
 Change the setting via WP Admin Panel &raquo; Settings &raquo; Order Posts Options
@@ -28,10 +28,16 @@ So, if you think the EXACT DATES of when a post was created and / or modified ar
 CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands - http://cagewebdev.com - http://cage.nl
 
 = Plugin URL =
-http://cagewebdev.com/index.php/order-posts-manually/
+http://cagewebdev.com/order-posts-manually/
 
 = Download URL =
 http://wordpress.org/extend/plugins/order-your-posts-manually/
+
+= Other WordPress plugins by Rolf van Gelder =
+Optimize Database after Deleting Revisions
+http://wordpress.org/plugins/rvg-optimize-database/
+Rocket Reader (Speed reader)
+http://wordpress.org/plugins/rocket-reader-speed-reader/
 
 = Disclaimer =
 No warranty, use at own risk!
@@ -42,6 +48,10 @@ No warranty, use at own risk!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+
+= 1.1 [08/14/2014] =
+* NEW: sticky posts are shown separately and cannot be moved anymore
+* CHANGE: some minor changes
 
 = 1.0 [07/29/2014] =
 * Initial release

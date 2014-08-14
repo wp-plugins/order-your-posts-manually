@@ -1,11 +1,11 @@
 <?php
-$opm_version      = '1.0';
-$opm_release_date = '07/29/2014';
+$opm_version      = '1.1';
+$opm_release_date = '08/14/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
-Description: Order your Posts Manually by Dragging and Dropping
-Version: 1.0
+Description: Order your Posts Manually by Dragging and Dropping them
+Version: 1.1
 Date: 07/29/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
@@ -47,7 +47,7 @@ add_action( 'admin_menu', 'opm_admin_menu' );
 *********************************************************************************************/
 function opm_list_posts()
 {
-	global $wpdb;
+	global $wpdb, $opm_version;
 	
 	$opm_date_field = get_option('opm_date_field');
 	
@@ -82,6 +82,17 @@ function opm_list_posts()
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 <style>
+#stickies {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#stickies li {
+	margin: 0 3px 10px 0px;
+	padding: 0.3em;
+	font-size: 1.1em;
+	height: 16px;
+}
 #sortable {
 	list-style-type: none;
 	margin: 0;
@@ -125,20 +136,29 @@ $(document).ready(function () {
 </script>
 <?php
 $dates = '';
+$nr_of_stickies = 0;
+$nr_of_posts    = 0;
 for($i=0; $i<count($results); $i++)
 {
-	if($i) $dates .= "#";
-	if($field_name == 'post_date')
+	if(is_sticky($results[$i]->ID))
 	{
-		$dates .= $results[$i]->post_date;
-		$mode = 'creation date';
+		$nr_of_stickies++;
 	}
 	else
-	{
-		$dates .= $results[$i]->post_modified;
-		$mode = 'modification date';
+	{	$nr_of_posts++;
+		if($dates) $dates .= "#";
+		if($field_name == 'post_date')
+		{
+			$dates .= $results[$i]->post_date;
+			$mode = 'creation date';
+		}
+		else
+		{
+			$dates .= $results[$i]->post_modified;
+			$mode = 'modification date';
+		}
 	}
-}
+} // for($i=0; $i<count($results); $i++)
 ?>
 <form action="" method="post">
   <input type="hidden" id="action" name="action" value="update_dates" />
@@ -146,7 +166,7 @@ for($i=0; $i<count($results); $i++)
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
   <br />
   <div id="post_table" style="margin:20px;">
-    <h1>Order your Posts Manually (sort type: <?php echo $mode; ?>)</h1>
+    <h1>Order your Posts Manually - v<?php echo $opm_version;?> (sort type: <?php echo $mode; ?>)</h1>
     <p><strong><br />
       WARNING:<br />
       Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.<br />
@@ -154,21 +174,46 @@ for($i=0; $i<count($results); $i++)
       So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON'T USE THIS PLUGIN!</strong></p>
     <br />
     <strong>Drag and drop the posts to change the display order!</strong><br />
-    (Don't forget to click the <strong>SAVE CHANGES</strong> button at the bottom of the screen to actually update the posts!)<br />
+    (After changing the order, don't forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts!)<br />
     <br />
-    <br>
-    <ul id="sortable">
-      <?php	
+    <strong style="color:#00F;">STICKY POSTS (<?php echo $nr_of_stickies;?>):</strong><br />
+    <br />
+    <ul id="stickies">
+      <?php
 	for($i=0; $i<count($results); $i++)
-	{
-		if($field_name == 'post_date')
-			$this_date = $results[$i]->post_date;
-		else
-			$this_date = $results[$i]->post_modified;		
+	{	if(is_sticky($results[$i]->ID))
+		{
+			if($field_name == 'post_date')
+				$this_date = $results[$i]->post_date;
+			else
+				$this_date = $results[$i]->post_modified;			
+?>
+      <li class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
+      <?php
+		}
+	}
+?>
+    </ul>  
+    <br />
+    <strong style="color:#00F;">REGULAR POSTS (<?php echo $nr_of_posts;?>):</strong><br />
+    <br />
+  <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
+  &nbsp;&nbsp;&nbsp;
+  <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" /> <br /><br />
+    <ul id="sortable">
+      <?php
+	for($i=0; $i<count($results); $i++)
+	{	if(!is_sticky($results[$i]->ID))
+		{
+			if($field_name == 'post_date')
+				$this_date = $results[$i]->post_date;
+			else
+				$this_date = $results[$i]->post_modified;		
 ?>
       <li id="post-id-<?php echo $results[$i]->ID?>" class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
-      <?php		
-	}
+      <?php
+		} // if(!is_sticky($results[$i]->ID))
+	} // for($i=0; $i<count($results); $i++)
 ?>
     </ul>
     <br />
