@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.1';
-$opm_release_date = '08/14/2014';
+$opm_version      = '1.2';
+$opm_release_date = '08/20/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.1
-Date: 07/29/2014
+Version: 1.2
+Date: 08/20/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPL2
@@ -53,6 +53,14 @@ function opm_list_posts()
 	
 	$field_name = ($opm_date_field == 0) ? 'post_date' : 'post_modified';
 
+	$opm_posts_per_page = get_option('opm_posts_per_page');
+	if(!$opm_posts_per_page) $opm_posts_per_page = 0;
+
+	/*************************************************************************
+	*
+	*	SAVE SETTINGS
+	*
+	*************************************************************************/
 	if(count($_POST)>0 && $_POST['action'] == 'update_dates')
 	{
 		$dates = explode('#', $_POST['dates']);
@@ -135,9 +143,12 @@ $(document).ready(function () {
 });
 </script>
 <?php
-$dates = '';
-$nr_of_stickies = 0;
-$nr_of_posts    = 0;
+$dates                = '';
+$nr_of_stickies       = 0;
+$nr_of_posts          = 0;
+
+if(isset($_REQUEST['pagnr'])) $pagnr = $_REQUEST['pagnr']; else $pagnr = 1;
+
 for($i=0; $i<count($results); $i++)
 {
 	if(is_sticky($results[$i]->ID))
@@ -161,6 +172,7 @@ for($i=0; $i<count($results); $i++)
 } // for($i=0; $i<count($results); $i++)
 ?>
 <form action="" method="post">
+  <input type="hidden" id="pagnr" name="pagnr" value="<?php echo $pagnr; ?>" />
   <input type="hidden" id="action" name="action" value="update_dates" />
   <input type="hidden" id="sortdata" name="sortdata" value="" />
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
@@ -173,13 +185,15 @@ for($i=0; $i<count($results); $i++)
       It will swap some of the dates. <br />
       So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON'T USE THIS PLUGIN!</strong></p>
     <br />
-    <strong>Drag and drop the posts to change the display order!</strong><br />
-    (After changing the order, don't forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts!)<br />
-    <br />
     <strong style="color:#00F;">STICKY POSTS (<?php echo $nr_of_stickies;?>):</strong><br />
     <br />
     <ul id="stickies">
       <?php
+	/*************************************************************************
+	*
+	*	DISPLAY STICKIES
+	*
+	*************************************************************************/	  
 	for($i=0; $i<count($results); $i++)
 	{	if(is_sticky($results[$i]->ID))
 		{
@@ -191,28 +205,80 @@ for($i=0; $i<count($results); $i++)
       <li class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
       <?php
 		}
+	} // for($i=0; $i<count($results); $i++)
+	
+	if($opm_posts_per_page>0)
+	{
+		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
+		$end   = $start + $opm_posts_per_page;
+		$end   = min($end, count($results));
+		$nr_of_pages = ceil($nr_of_posts/$opm_posts_per_page);
+	}
+	else
+	{
+		$start       = 1;
+		$end         = count($results);
+		$nr_of_pages = 1;
 	}
 ?>
-    </ul>  
+    </ul>
     <br />
+    <?php
+	if($opm_posts_per_page>0)
+	{
+?>
+    <strong style="color:#00F;">REGULAR POSTS (page <?php echo $pagnr?> of <?php echo $nr_of_pages?> - total number of posts: <?php echo $nr_of_posts;?>):</strong><br />
+    <?php
+	}
+	else
+	{
+?>
     <strong style="color:#00F;">REGULAR POSTS (<?php echo $nr_of_posts;?>):</strong><br />
+    <?php		
+	}
+?>
     <br />
-  <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
-  &nbsp;&nbsp;&nbsp;
-  <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" /> <br /><br />
+    <strong>Drag and drop the posts to change the display order!</strong><br />
+    (After changing the order, don't forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts)<br />
+    <br />
+    <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
+    <?php
+	if($pagnr>1)
+	{
+?>
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="PREVIOUS PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr-1);?>';" class="button" />
+    <?php
+	}
+?>
+    <?php
+	if($end < count($results))
+	{
+?>
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="NEXT PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr+1);?>';" class="button" />
+    <?php
+	}
+?>
+    <br />
+    <br />
     <ul id="sortable">
       <?php
-	for($i=0; $i<count($results); $i++)
-	{	if(!is_sticky($results[$i]->ID))
-		{
-			if($field_name == 'post_date')
-				$this_date = $results[$i]->post_date;
-			else
-				$this_date = $results[$i]->post_modified;		
+	/*************************************************************************
+	*
+	*	DISPLAY POSTS
+	*
+	*************************************************************************/
+	for($i=$start; $i<$end; $i++)
+	{	if($field_name == 'post_date')
+			$this_date = $results[$i]->post_date;
+		else
+			$this_date = $results[$i]->post_modified;		
 ?>
       <li id="post-id-<?php echo $results[$i]->ID?>" class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
       <?php
-		} // if(!is_sticky($results[$i]->ID))
 	} // for($i=0; $i<count($results); $i++)
 ?>
     </ul>
@@ -220,6 +286,24 @@ for($i=0; $i<count($results); $i++)
     <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
     <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
+    <?php
+	if($pagnr>1)
+	{
+?>
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="PREVIOUS PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr-1);?>';" class="button" />
+    <?php
+	}
+?>
+    <?php
+	if($end < count($results))
+	{
+?>
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="NEXT PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr+1);?>';" class="button" />
+    <?php
+	}
+?>
   </div>
 </form>
 <?php
@@ -237,11 +321,15 @@ function opm_options_page()
 	if (isset($_POST['action']) && $_POST['action']=='save_options')
 	{
 		update_option('opm_date_field', $_REQUEST['opm_date_field']);
+		update_option('opm_posts_per_page', $_REQUEST['opm_posts_per_page']);
 		echo "<div class='updated'><p><strong>Order Posts Manually OPTIONS UPDATED!</strong>";
 	}
 
 	$opm_date_field = get_option('opm_date_field');
 	if(!$opm_date_field) $opm_date_field = '0';	// sort order: creation date (default)
+	
+	$opm_posts_per_page = get_option('opm_posts_per_page');
+	if(!$opm_posts_per_page) $opm_posts_per_page = '0';	// ALL posts (default)
 ?>
 <style type="text/css">
 #opm_options_form {
@@ -257,7 +345,7 @@ function opm_options_page()
     Author: <strong>Rolf van Gelder - CAGE Web Design, Eindhoven, The Netherlands</strong><br>
     Website: <a href="http://cagewebdev.com" target="_blank">http://cagewebdev.com</a><br />
     Plugin page: <a href="http://cagewebdev.com/order-posts-manually/" target="_blank">http://cagewebdev.com/order-posts-manually/</a><br />
-    Download page: <a href="http://wordpress.org/plugins/rvg-order-posts-manually/" target="_blank">http://wordpress.org/plugins/rvg-order-posts-manually/</a> </p>
+    Download page: <a href="http://wordpress.org/plugins/order-your-posts-manually/" target="_blank">http://wordpress.org/plugins/order-your-posts-manually/</a></p>
   <br />
   <hr />
   <br />
@@ -281,6 +369,21 @@ function opm_options_page()
     <script type="text/javascript">
 	jQuery("#opm_date_field").val(<?php echo $opm_date_field; ?>);
 	</script><br />
+    <br />
+    <p><strong>Number of posts to show per page:</strong></p>
+    <select name="opm_posts_per_page" id="opm_posts_per_page">
+      <option value="0">show ALL posts at once</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="250">250</option>
+      <option value="500">500</option>
+    </select>
+    <script type="text/javascript">
+	jQuery("#opm_posts_per_page").val(<?php echo $opm_posts_per_page; ?>);
+	</script><br />
+    <br />
     <br />
     <input name="submit" type="submit" value="SAVE OPTIONS" class="button-primary button-large" />
   </form>
