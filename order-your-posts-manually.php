@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.2';
-$opm_release_date = '08/20/2014';
+$opm_version      = '1.3';
+$opm_release_date = '08/21/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.2
-Date: 08/20/2014
+Version: 1.3
+Date: 08/21/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPL2
@@ -49,11 +49,14 @@ function opm_list_posts()
 {
 	global $wpdb, $opm_version;
 	
+	// GET SORTING ORDER FROM OPTIONS
 	$opm_date_field = get_option('opm_date_field');
-	
 	$field_name = ($opm_date_field == 0) ? 'post_date' : 'post_modified';
 
+	// GET NUMBER OF POSTS PER PAGE FROM OPTIONS
 	$opm_posts_per_page = get_option('opm_posts_per_page');
+	
+	// DEFAULT: ALL POSTS AT ONCE
 	if(!$opm_posts_per_page) $opm_posts_per_page = 0;
 
 	/*************************************************************************
@@ -86,6 +89,37 @@ function opm_list_posts()
 	ORDER BY `".$field_name."` DESC
 	";
 	$results = $wpdb -> get_results($sql);
+
+	$dates                = '';
+	$nr_of_stickies       = 0;
+	$nr_of_posts          = 0;
+	
+	/*************************************************************************************
+	 *
+	 *	COUNT THE NUMBER OF STICKIES AND SAVE THE ORIGINAL DATES TO A STRING
+	 *
+	 ************************************************************************************/
+	for($i=0; $i<count($results); $i++)
+	{
+		if(is_sticky($results[$i]->ID))
+		{
+			$nr_of_stickies++;
+		}
+		else
+		{	$nr_of_posts++;
+			if($dates) $dates .= "#";
+			if($field_name == 'post_date')
+			{
+				$dates .= $results[$i]->post_date;
+				$mode = 'creation date';
+			}
+			else
+			{
+				$dates .= $results[$i]->post_modified;
+				$mode = 'modification date';
+			}
+		}
+	} // for($i=0; $i<count($results); $i++)
 ?>
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
@@ -131,48 +165,87 @@ small {
 }
 </style>
 <script type="text/javascript">
-$(document).ready(function () {
-    $('#sortable').sortable({
-        // axis: 'y',
-		placeholder: 'placeholder',
-        stop: function (event, ui) {
-	        var oData = $(this).sortable('serialize');
-            $('#sortdata').val(oData);
-		}
-    });
+var pagnr = 1;
+var busy  = false;
+var done  = false;
+
+/*************************************************************************************
+ *
+ *	GET SETS OF POSTS (PER PAGE)
+ *
+ ************************************************************************************/
+function get_posts()
+{
+	if(done) return;
+	
+	var data = {
+		'action': 'my_action',
+		'opm_posts_per_page': <?php echo $opm_posts_per_page;?>,
+		'nr_of_stickies': <?php echo $nr_of_stickies;?>,
+		'nr_of_posts': <?php echo $nr_of_posts;?>,
+		'pagnr': pagnr,
+		'field_name': '<?php echo $field_name;?>'
+	};
+
+/*		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
+		$end   = $start + $opm_posts_per_page;
+		$end   = min($end, $nr_of_posts);*/
+
+	// <ajaxurl> IS DEFINED SINCE WP v2.8
+	$.post(ajaxurl, data, function(response) {
+		// alert('Got this from the server: ' + response);
+		$("#sortable").append(response);
+		pagnr++;
+		busy = false;
+		$("#loading").hide();
+	});
+	
+	var end = (pagnr-1)*<?php echo $opm_posts_per_page;?>+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
+	if(end > <?php echo $nr_of_posts;?>) done = true;
+} // get_posts()
+
+
+/*************************************************************************************
+ *
+ *	INITIALIZE JQUERY
+ *
+ ************************************************************************************/
+$(document).ready(function ()
+{	// TAKE CARE OF THE DRAGGING AND DROPPING
+	$('#sortable').sortable({
+			placeholder: 'placeholder',
+			stop: function (event, ui) {
+				var oData = $(this).sortable('serialize');
+				$('#sortdata').val(oData);
+			}
+	});
+	// GET NEXT SET OF POSTS
+	if(!done) get_posts();
+});
+
+
+/*************************************************************************************
+ *
+ *	CHECK IF WE ARE AT THE END OF THE PAGE
+ *
+ ************************************************************************************/
+$(window).scroll(function()
+{	if(!busy && !done && ($(window).scrollTop() + $(window).height() == $(document).height()))
+	{	busy = true;
+		$("#loading").show();
+		// GET NEXT OF POSTS
+		get_posts();
+	}
 });
 </script>
 <?php
-$dates                = '';
-$nr_of_stickies       = 0;
-$nr_of_posts          = 0;
-
-if(isset($_REQUEST['pagnr'])) $pagnr = $_REQUEST['pagnr']; else $pagnr = 1;
-
-for($i=0; $i<count($results); $i++)
-{
-	if(is_sticky($results[$i]->ID))
-	{
-		$nr_of_stickies++;
-	}
-	else
-	{	$nr_of_posts++;
-		if($dates) $dates .= "#";
-		if($field_name == 'post_date')
-		{
-			$dates .= $results[$i]->post_date;
-			$mode = 'creation date';
-		}
-		else
-		{
-			$dates .= $results[$i]->post_modified;
-			$mode = 'modification date';
-		}
-	}
-} // for($i=0; $i<count($results); $i++)
+/*************************************************************************************
+ *
+ *	DISPLAY THE PAGE
+ *
+ ************************************************************************************/
 ?>
 <form action="" method="post">
-  <input type="hidden" id="pagnr" name="pagnr" value="<?php echo $pagnr; ?>" />
   <input type="hidden" id="action" name="action" value="update_dates" />
   <input type="hidden" id="sortdata" name="sortdata" value="" />
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
@@ -206,37 +279,10 @@ for($i=0; $i<count($results); $i++)
       <?php
 		}
 	} // for($i=0; $i<count($results); $i++)
-	
-	if($opm_posts_per_page>0)
-	{
-		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
-		$end   = $start + $opm_posts_per_page;
-		$end   = min($end, count($results));
-		$nr_of_pages = ceil($nr_of_posts/$opm_posts_per_page);
-	}
-	else
-	{
-		$start       = 1;
-		$end         = count($results);
-		$nr_of_pages = 1;
-	}
 ?>
     </ul>
     <br />
-    <?php
-	if($opm_posts_per_page>0)
-	{
-?>
-    <strong style="color:#00F;">REGULAR POSTS (page <?php echo $pagnr?> of <?php echo $nr_of_pages?> - total number of posts: <?php echo $nr_of_posts;?>):</strong><br />
-    <?php
-	}
-	else
-	{
-?>
     <strong style="color:#00F;">REGULAR POSTS (<?php echo $nr_of_posts;?>):</strong><br />
-    <?php		
-	}
-?>
     <br />
     <strong>Drag and drop the posts to change the display order!</strong><br />
     (After changing the order, don't forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts)<br />
@@ -244,70 +290,90 @@ for($i=0; $i<count($results); $i++)
     <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
     <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
-    <?php
-	if($pagnr>1)
-	{
-?>
-    &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="PREVIOUS PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr-1);?>';" class="button" />
-    <?php
-	}
-?>
-    <?php
-	if($end < count($results))
-	{
-?>
-    &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="NEXT PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr+1);?>';" class="button" />
-    <?php
-	}
-?>
     <br />
     <br />
-    <ul id="sortable">
-      <?php
+<?php    
 	/*************************************************************************
 	*
-	*	DISPLAY POSTS
+	*	PLACEHOLDER FOR THE ACTUAL POSTS
 	*
 	*************************************************************************/
+?>	
+    <ul id="sortable">
+    </ul><br />
+    <div id="loading" style="display:none;">Loading new posts...<br /><br /><br /></div>
+<?php    
+	/*************************************************************************
+	*
+	*	BOTTOM BUTTONS
+	*
+	*************************************************************************/
+?>	    
+    <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
+    &nbsp;&nbsp;&nbsp;
+    <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
+  </div>
+</form>
+<?php
+} // function opm_list_posts()
+
+
+/********************************************************************************************
+
+	AJAX SERVER FOR RETRIEVING SETS OF POSTS
+
+*********************************************************************************************/
+add_action( 'wp_ajax_my_action', 'my_action_callback' );
+
+function my_action_callback()
+{
+	global $wpdb;
+
+	// GET THE PARAMETERS
+	$pagnr                = intval($_POST['pagnr']);
+	$opm_posts_per_page   = intval($_POST['opm_posts_per_page']);
+	$nr_of_stickies       = intval($_POST['nr_of_stickies']);
+	$nr_of_posts          = intval($_POST['nr_of_posts']);
+	$field_name           = $_POST['field_name'];
+
+	if($opm_posts_per_page > 0)
+	{	// LIMITED NUMBER OF POSTS PER PAGE
+		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
+		$end   = $start + $opm_posts_per_page;
+		$end   = min($end, $nr_of_posts);
+	}
+	else
+	{	// ALL POSTS
+		$start = 1;
+		$end   = $nr_of_posts;
+	}
+	
+	$sql = "
+	SELECT `ID`, `".$field_name."`, `post_title`
+	FROM   $wpdb->posts
+	WHERE `post_type`   = 'post'
+	AND   `post_status` = 'publish'
+	ORDER BY `".$field_name."` DESC
+	";
+	$results = $wpdb -> get_results($sql);	
+
+	// COLLECT THE POSTS
+	$posts = '';
 	for($i=$start; $i<$end; $i++)
 	{	if($field_name == 'post_date')
 			$this_date = $results[$i]->post_date;
 		else
-			$this_date = $results[$i]->post_modified;		
-?>
-      <li id="post-id-<?php echo $results[$i]->ID?>" class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
-      <?php
-	} // for($i=0; $i<count($results); $i++)
-?>
-    </ul>
-    <br />
-    <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
-    &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
-    <?php
-	if($pagnr>1)
-	{
-?>
-    &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="PREVIOUS PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr-1);?>';" class="button" />
-    <?php
-	}
-?>
-    <?php
-	if($end < count($results))
-	{
-?>
-    &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="NEXT PAGE" type="button" onclick="self.location='tools.php?page=opm-order-posts.php&pagnr=<?php echo ($pagnr+1);?>';" class="button" />
-    <?php
-	}
-?>
-  </div>
-</form>
-<?php
+			$this_date = $results[$i]->post_modified;
+		$posts .= '<li id="post-id-'.$results[$i]->ID.'" class="ui-state-default" title="Post ID: '.$results[$i]->ID.'"><small>'.$this_date.'</small> * <strong>'.$results[$i]->post_title.'</strong></li>';
+	} // for($i=$start; $i<$end; $i++)
+
+	// RETURN THE SET OF POSTS TO THE CALLER
+	echo $posts;
+
+	// NEEDED FOR AN AJAX SERVER
+	die();
 }
+
 
 /********************************************************************************************
 
