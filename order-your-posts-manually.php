@@ -1,11 +1,11 @@
 <?php
-$opm_version      = '1.4';
+$opm_version      = '1.4.1';
 $opm_release_date = '09/06/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.4
+Version: 1.4.1
 Date: 09/06/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/

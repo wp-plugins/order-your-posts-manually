@@ -8,8 +8,8 @@ Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
 Tested up to: 4.0
-Stable tag: 1.4
-Version: 1.4
+Stable tag: 1.4.1
+Version: 1.4.1
 License: GPLv2 or later
 
 == Description ==
@@ -50,7 +50,7 @@ NO WARRANTY, USE AT OWN RISK!
 
 == Changelog ==
 
-= 1.4 [09/06/2014] =
+= 1.4.1 [09/06/2014] =
 * CHANGE: many changes and bug fixes
 
 = 1.3 [08/21/2014] =
