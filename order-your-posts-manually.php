@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.3';
-$opm_release_date = '08/21/2014';
+$opm_version      = '1.4';
+$opm_release_date = '09/06/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.3
-Date: 08/21/2014
+Version: 1.4
+Date: 09/06/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPL2
@@ -61,34 +61,32 @@ function opm_list_posts()
 
 	/*************************************************************************
 	*
-	*	SAVE SETTINGS
+	*	UPDATE POST DATES
 	*
 	*************************************************************************/
 	if(count($_POST)>0 && $_POST['action'] == 'update_dates')
 	{
-		$dates = explode('#', $_POST['dates']);
+		$dates   = explode('#', $_POST['dates']);
 		$postids = explode('&', $_POST['sortdata']);
+		
 		for($p=0; $p<count($postids); $p++)
 		{	$q = explode('=', $postids[$p]);
 			$post_id = $q[1];
 			$sql = "
-			UPDATE $wpdb->posts
-			SET `".$field_name."` = '$dates[$p]'
-			WHERE `ID` = $post_id
-			";
+			UPDATE $wpdb->posts SET `".$field_name."` = '$dates[$p]' WHERE `ID` = $post_id";
 			$wpdb -> get_results($sql);
 		}
 		echo "<div class='updated'><p><strong>SORT ORDER SAVED!</strong>";
-	}
+	} // if(count($_POST)>0 && $_POST['action'] == 'update_dates')
+	
 
-	$sql = "
-	SELECT `ID`, `".$field_name."`, `post_title`
-	FROM   $wpdb->posts
-	WHERE `post_type`   = 'post'
-	AND   `post_status` = 'publish'
-	ORDER BY `".$field_name."` DESC
-	";
-	$results = $wpdb -> get_results($sql);
+	/*************************************************************************
+	*
+	*	GET THE POSTS
+	*
+	*************************************************************************/
+	$args    = array( 'posts_per_page' => 999999, 'orderby' => $field_name );
+	$myposts = get_posts($args);
 
 	$dates                = '';
 	$nr_of_stickies       = 0;
@@ -99,27 +97,28 @@ function opm_list_posts()
 	 *	COUNT THE NUMBER OF STICKIES AND SAVE THE ORIGINAL DATES TO A STRING
 	 *
 	 ************************************************************************************/
-	for($i=0; $i<count($results); $i++)
+	foreach($myposts as $post)
 	{
-		if(is_sticky($results[$i]->ID))
+		if(is_sticky($post->ID))
 		{
 			$nr_of_stickies++;
 		}
 		else
-		{	$nr_of_posts++;
+		{
+			$nr_of_posts++;
 			if($dates) $dates .= "#";
 			if($field_name == 'post_date')
 			{
-				$dates .= $results[$i]->post_date;
+				$dates .= $post->post_date;
 				$mode = 'creation date';
 			}
 			else
 			{
-				$dates .= $results[$i]->post_modified;
+				$dates .= $post->post_modified;
 				$mode = 'modification date';
-			}
-		}
-	} // for($i=0; $i<count($results); $i++)
+			}			
+		} // if(is_sticky($post->ID))
+	} // foreach($myposts as $post)
 ?>
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
@@ -174,7 +173,7 @@ var done  = false;
  *	GET SETS OF POSTS (PER PAGE)
  *
  ************************************************************************************/
-function get_posts()
+function opm_get_posts()
 {
 	if(done) return;
 	
@@ -182,27 +181,22 @@ function get_posts()
 		'action': 'my_action',
 		'opm_posts_per_page': <?php echo $opm_posts_per_page;?>,
 		'nr_of_stickies': <?php echo $nr_of_stickies;?>,
-		'nr_of_posts': <?php echo $nr_of_posts;?>,
+		'nr_of_posts': <?php echo $nr_of_posts;?>,	// EXCL. STICKIES
 		'pagnr': pagnr,
 		'field_name': '<?php echo $field_name;?>'
 	};
 
-/*		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
-		$end   = $start + $opm_posts_per_page;
-		$end   = min($end, $nr_of_posts);*/
-
-	// <ajaxurl> IS DEFINED SINCE WP v2.8
+	// <ajaxurl> IS DEFINED SINCE WP v2.8!
 	$.post(ajaxurl, data, function(response) {
-		// alert('Got this from the server: ' + response);
 		$("#sortable").append(response);
 		pagnr++;
 		busy = false;
 		$("#loading").hide();
 	});
 	
-	var end = (pagnr-1)*<?php echo $opm_posts_per_page;?>+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
-	if(end > <?php echo $nr_of_posts;?>) done = true;
-} // get_posts()
+	var end = ((pagnr-1)*<?php echo $opm_posts_per_page;?>)+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
+	if(end > <?php echo $nr_of_posts;?> || <?php echo $opm_posts_per_page;?> == 0) done = true;
+} // opm_get_posts()
 
 
 /*************************************************************************************
@@ -220,7 +214,7 @@ $(document).ready(function ()
 			}
 	});
 	// GET NEXT SET OF POSTS
-	if(!done) get_posts();
+	if(!done) opm_get_posts();
 });
 
 
@@ -234,7 +228,7 @@ $(window).scroll(function()
 	{	busy = true;
 		$("#loading").show();
 		// GET NEXT OF POSTS
-		get_posts();
+		opm_get_posts();
 	}
 });
 </script>
@@ -266,19 +260,20 @@ $(window).scroll(function()
 	*
 	*	DISPLAY STICKIES
 	*
-	*************************************************************************/	  
-	for($i=0; $i<count($results); $i++)
-	{	if(is_sticky($results[$i]->ID))
+	*************************************************************************/
+	foreach($myposts as $post)
+	{	if(is_sticky($post->ID))
 		{
 			if($field_name == 'post_date')
-				$this_date = $results[$i]->post_date;
+				$this_date = $post->post_date;
 			else
-				$this_date = $results[$i]->post_modified;			
+				$this_date = $post->post_modified;			
 ?>
-      <li class="ui-state-default" title="Post ID: <?php echo $results[$i]->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $results[$i]->post_title?></strong></li>
+      <li class="ui-state-default" title="Post ID: <?php echo $post->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $post->post_title?></strong></li>
       <?php
 		}
-	} // for($i=0; $i<count($results); $i++)
+		
+	} // foreach($myposts as $post)
 ?>
     </ul>
     <br />
@@ -292,23 +287,28 @@ $(window).scroll(function()
     <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
     <br />
     <br />
-<?php    
+    <?php    
 	/*************************************************************************
 	*
 	*	PLACEHOLDER FOR THE ACTUAL POSTS
 	*
 	*************************************************************************/
-?>	
+	$loader_image = plugins_url().'/order-your-posts-manually/loader.gif';
+?>
     <ul id="sortable">
-    </ul><br />
-    <div id="loading" style="display:none;">Loading new posts...<br /><br /><br /></div>
-<?php    
+    </ul>
+    <br />
+    <div id="loading" style="display:none;" align="center"><img src="<?php echo $loader_image;?>" /><br />
+      <br />
+      <br />
+    </div>
+    <?php    
 	/*************************************************************************
 	*
 	*	BOTTOM BUTTONS
 	*
 	*************************************************************************/
-?>	    
+?>
     <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
     <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
@@ -338,34 +338,29 @@ function my_action_callback()
 
 	if($opm_posts_per_page > 0)
 	{	// LIMITED NUMBER OF POSTS PER PAGE
-		$start = ($pagnr-1)*$opm_posts_per_page + $nr_of_stickies;
+		$start = ($pagnr-1)*$opm_posts_per_page;
 		$end   = $start + $opm_posts_per_page;
 		$end   = min($end, $nr_of_posts);
 	}
 	else
 	{	// ALL POSTS
-		$start = 1;
+		$start = 0;
 		$end   = $nr_of_posts;
 	}
-	
-	$sql = "
-	SELECT `ID`, `".$field_name."`, `post_title`
-	FROM   $wpdb->posts
-	WHERE `post_type`   = 'post'
-	AND   `post_status` = 'publish'
-	ORDER BY `".$field_name."` DESC
-	";
-	$results = $wpdb -> get_results($sql);	
 
+	$args    = array( 'posts_per_page' => 999999, 'orderby' => $field_name );
+    $myposts = get_posts( array( 'post__not_in' => get_option( 'sticky_posts' ), 'posts_per_page' => 999999, 'orderby' => $field_name ) );
+	
 	// COLLECT THE POSTS
 	$posts = '';
 	for($i=$start; $i<$end; $i++)
-	{	if($field_name == 'post_date')
-			$this_date = $results[$i]->post_date;
+	{
+		if($field_name == 'post_date')
+			$this_date = $myposts[$i]->post_date;
 		else
-			$this_date = $results[$i]->post_modified;
-		$posts .= '<li id="post-id-'.$results[$i]->ID.'" class="ui-state-default" title="Post ID: '.$results[$i]->ID.'"><small>'.$this_date.'</small> * <strong>'.$results[$i]->post_title.'</strong></li>';
-	} // for($i=$start; $i<$end; $i++)
+			$this_date = $myposts[$i]->post_modified;
+		$posts .= '<li id="post-id-'.$myposts[$i]->ID.'" class="ui-state-default" title="Post ID: '.$myposts[$i]->ID.'"><small>'.$this_date.'</small> * <strong>'.$myposts[$i]->post_title.'</strong></li>';
+	}
 
 	// RETURN THE SET OF POSTS TO THE CALLER
 	echo $posts;
