@@ -1,18 +1,33 @@
 <?php
-$opm_version      = '1.4.1';
-$opm_release_date = '09/06/2014';
+$opm_version      = '1.5';
+$opm_release_date = '10/20/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.4.1
-Date: 09/06/2014
+Version: 1.5
+Date: 10/20/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
-License: GPL2
+License: GPLv2 or later
 */
 ?>
 <?php
+/********************************************************************************************
+
+	ADD THE LANGUAGE SUPPORT (LOCALIZATION)
+
+*********************************************************************************************/
+function opm_action_init()
+{
+	// TEXT DOMAIN
+	load_plugin_textdomain('order-your-posts-manually', false, dirname(plugin_basename(__FILE__)));
+}
+
+// INIT HOOK
+add_action('init', 'opm_action_init');
+
+
 /********************************************************************************************
 
 	ADD THE 'ORDER POSTS MANUALLY' ITEM TO THE ADMIN TOOLS MENU
@@ -20,7 +35,7 @@ License: GPL2
 *********************************************************************************************/
 function opm_main()
 {	if (function_exists('add_management_page'))
-	{	add_management_page(__('Order Posts Manually'), __('Order Posts Manually'), 'administrator','opm-order-posts.php', 'opm_list_posts');
+	{	add_management_page(__('Order Your Posts Manually','order-your-posts-manually'), __('Order Your Posts Manually','order-your-posts-manually'), 'administrator','opm-order-posts.php', 'opm_list_posts');
     }
 } // opm_main()
 add_action('admin_menu', 'opm_main');
@@ -34,7 +49,7 @@ add_action('admin_menu', 'opm_main');
 function opm_admin_menu()
 {	
 	if (function_exists('add_options_page'))
-	{	add_options_page(__('Order Posts Options'), __('Order Posts Options'), 'manage_options', 'opm_admin', 'opm_options_page');
+	{	add_options_page(__('Order Your Posts Manually Options','order-your-posts-manually'), __('Order Your Posts Manually Options','order-your-posts-manually'), 'manage_options', 'opm_admin', 'opm_options_page');
     }
 } // opm_admin_menu()
 add_action( 'admin_menu', 'opm_admin_menu' );
@@ -47,7 +62,7 @@ add_action( 'admin_menu', 'opm_admin_menu' );
 *********************************************************************************************/
 function opm_list_posts()
 {
-	global $wpdb, $opm_version;
+	global $wpdb, $opm_version, $opm_release_date;
 	
 	// GET SORTING ORDER FROM OPTIONS
 	$opm_date_field = get_option('opm_date_field');
@@ -76,7 +91,7 @@ function opm_list_posts()
 			UPDATE $wpdb->posts SET `".$field_name."` = '$dates[$p]' WHERE `ID` = $post_id";
 			$wpdb -> get_results($sql);
 		}
-		echo "<div class='updated'><p><strong>SORT ORDER SAVED!</strong>";
+		echo "<div class='updated'><p><strong>".__('SORT ORDER SAVED!', 'order-your-posts-manually')."</strong></p></div>";
 	} // if(count($_POST)>0 && $_POST['action'] == 'update_dates')
 	
 
@@ -110,12 +125,12 @@ function opm_list_posts()
 			if($field_name == 'post_date')
 			{
 				$dates .= $post->post_date;
-				$mode = 'creation date';
+				$mode = __('creation date', 'order-your-posts-manually');
 			}
 			else
 			{
 				$dates .= $post->post_modified;
-				$mode = 'modification date';
+				$mode = __('modification date', 'order-your-posts-manually');
 			}			
 		} // if(is_sticky($post->ID))
 	} // foreach($myposts as $post)
@@ -187,7 +202,7 @@ function opm_get_posts()
 	};
 
 	// <ajaxurl> IS DEFINED SINCE WP v2.8!
-	$.post(ajaxurl, data, function(response) {
+	jQuery.post(ajaxurl, data, function(response) {
 		$("#sortable").append(response);
 		pagnr++;
 		busy = false;
@@ -227,7 +242,7 @@ $(window).scroll(function()
 {	if(!busy && !done && ($(window).scrollTop() + $(window).height() == $(document).height()))
 	{	busy = true;
 		$("#loading").show();
-		// GET NEXT OF POSTS
+		// GET NEXT SET OF POSTS
 		opm_get_posts();
 	}
 });
@@ -245,14 +260,18 @@ $(window).scroll(function()
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
   <br />
   <div id="post_table" style="margin:20px;">
-    <h1>Order your Posts Manually - v<?php echo $opm_version;?> (sort type: <?php echo $mode; ?>)</h1>
+    <h1>Order your Posts Manually - v<?php echo $opm_version;?> (<?php echo __('sort type', 'order-your-posts-manually'); ?>: <?php echo $mode; ?>)</h1>
+    <p>
+    <?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
+    <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
+    </p>
     <p><strong><br />
-      WARNING:<br />
-      Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.<br />
-      It will swap some of the dates. <br />
-      So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON'T USE THIS PLUGIN!</strong></p>
+      <?php echo __('WARNING', 'order-your-posts-manually'); ?>:<br />
+      <?php echo __('Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.', 'order-your-posts-manually'); ?><br />
+      <?php echo __('It will swap some of the dates.', 'order-your-posts-manually'); ?><br />
+      <?php echo __('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></strong></p>
     <br />
-    <strong style="color:#00F;">STICKY POSTS (<?php echo $nr_of_stickies;?>):</strong><br />
+    <strong style="color:#00F;"><?php echo __('STICKY POSTS', 'order-your-posts-manually'); ?> (<?php echo $nr_of_stickies;?>):</strong><br />
     <br />
     <ul id="stickies">
       <?php
@@ -277,14 +296,14 @@ $(window).scroll(function()
 ?>
     </ul>
     <br />
-    <strong style="color:#00F;">REGULAR POSTS (<?php echo $nr_of_posts;?>):</strong><br />
+    <strong style="color:#00F;"><?php echo __('REGULAR POSTS', 'order-your-posts-manually'); ?> (<?php echo $nr_of_posts;?>):</strong><br />
     <br />
-    <strong>Drag and drop the posts to change the display order!</strong><br />
-    (After changing the order, don't forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts)<br />
+    <strong><?php echo __('Drag and drop the posts to change the display order!', 'order-your-posts-manually'); ?></strong><br />
+    (<?php echo __('After changing the order, don\'t forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts', 'order-your-posts-manually'); ?>)<br />
     <br />
-    <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
+    <input name="submit" type="submit" value="<?php echo __('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
+    <input name="cancel" value="<?php echo __('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
     <br />
     <br />
     <?php    
@@ -309,9 +328,9 @@ $(window).scroll(function()
 	*
 	*************************************************************************/
 ?>
-    <input name="submit" type="submit" value="SAVE CHANGES" class="button-primary button-large" />
+    <input name="submit" type="submit" value="<?php echo __('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="RELOAD POSTS" type="button" onclick="self.location='';" class="button" />
+    <input name="cancel" value="<?php echo __('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
   </div>
 </form>
 <?php
@@ -383,7 +402,7 @@ function opm_options_page()
 	{
 		update_option('opm_date_field', $_REQUEST['opm_date_field']);
 		update_option('opm_posts_per_page', $_REQUEST['opm_posts_per_page']);
-		echo "<div class='updated'><p><strong>Order Posts Manually OPTIONS UPDATED!</strong>";
+		echo "<div class='updated'><p><strong>".__('Order Your Posts Manually OPTIONS UPDATED!','order-your-posts-manually')."</strong></p></div>";
 	}
 
 	$opm_date_field = get_option('opm_date_field');
@@ -392,6 +411,7 @@ function opm_options_page()
 	$opm_posts_per_page = get_option('opm_posts_per_page');
 	if(!$opm_posts_per_page) $opm_posts_per_page = '0';	// ALL posts (default)
 ?>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <style type="text/css">
 #opm_options_form {
 	margin: 40px;
@@ -399,41 +419,38 @@ function opm_options_page()
 </style>
 <div id="opm_options_form">
   <p>
-  <h1>Order your Posts Manually</h1>
-  <em><strong>With this plugin your visually can change the order of the posts for when they will be displayed</strong></em>
+  <h1><?php echo __('Order Your Posts Manually', 'order-your-posts-manually'); ?></h1>
+  <em><strong><?php echo __('With this plugin your visually can change the order of the posts for when they will be displayed', 'order-your-posts-manually'); ?></strong></em>
   </p>
-  <p> Version: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
-    Author: <strong>Rolf van Gelder - CAGE Web Design, Eindhoven, The Netherlands</strong><br>
-    Website: <a href="http://cagewebdev.com" target="_blank">http://cagewebdev.com</a><br />
-    Plugin page: <a href="http://cagewebdev.com/order-posts-manually/" target="_blank">http://cagewebdev.com/order-posts-manually/</a><br />
-    Download page: <a href="http://wordpress.org/plugins/order-your-posts-manually/" target="_blank">http://wordpress.org/plugins/order-your-posts-manually/</a></p>
+  <p><?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
+    <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
+    <?php echo __('Website', 'order-your-posts-manually'); ?>: <a href="http://cagewebdev.com" target="_blank">http://cagewebdev.com</a><br />
+    <?php echo __('Plugin page', 'order-your-posts-manually'); ?>: <a href="http://cagewebdev.com/order-posts-manually/" target="_blank">http://cagewebdev.com/order-posts-manually/</a><br />
+    <?php echo __('Download page', 'order-your-posts-manually'); ?>: <a href="http://wordpress.org/plugins/order-your-posts-manually/" target="_blank">http://wordpress.org/plugins/order-your-posts-manually/</a></p>
   <br />
   <hr />
   <br />
-  <h2>Order your Posts Manually - Options</h2>
-  <p><strong>WARNING:<br />
-    Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.<br />
-    It will swap some of the dates. </strong><strong><br />
-    So if you think the EXACT DATES of when a post was created and / or modified are extremely important: DON'T USE THIS PLUGIN!<br />
-    If you think the DISPLAY ORDER of your posts 
-    is more important than the exact dates, then DO USE this plugin!</strong></p>
-  <p>Per default WordPress orders the posts using the <strong>CREATION date</strong> (also known as '<strong>post_date</strong>'). Last created posts first.</p>
-  <p>Some site designers (including myself) prefer the ordering of the posts using the <strong>MODIFICATION date</strong> (go to <a href="http://web20bp.com/kb/wordpress-sort-posts-on-modified-date/" target="_blank">this page</a> to see how to do that).<br />
-    So, last modified posts will show up first.</p>
-  <p>If you belong to the second category (<strong>MODIFICATION date</strong>) select the second option in the drop down box below!</p>
+  <h2><?php echo __('Order Your Posts Manually - Options', 'order-your-posts-manually'); ?></h2>
+  <p><strong><?php echo __('WARNING','order-your-posts-manually');?>:<br />
+    <?php echo __('Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.', 'order-your-posts-manually'); ?><br />
+    <?php echo __('It will swap some of the dates.', 'order-your-posts-manually'); ?><br />
+    <?php echo __('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></strong></p></strong></p>
+  <p><?php echo __('Per default WordPress orders the posts using the <strong>CREATION date</strong> (also known as \'<strong>post_date</strong>\'). Last created posts first.','order-your-posts-manually');?></p>
+  <p><?php echo __('Some site designers (including myself) prefer the ordering of the posts using the <strong>MODIFICATION date</strong> (go to <a href="http://web20bp.com/kb/wordpress-sort-posts-on-modified-date/" target="_blank">this page</a> to see how to do that).<br />So, last modified posts will show up first.', 'order-your-posts-manually'); ?></p>
+  <p><?php echo __('If you belong to the second category (<strong>MODIFICATION date</strong>) select the second option in the drop down box below!', 'order-your-posts-manually'); ?></p>
   <form action="" method="post" name="options_form">
     <input name="action" type="hidden" value="save_options" />
     <select name="opm_date_field" id="opm_date_field">
-      <option value="0">use CREATION DATES of the posts</option>
-      <option value="1">use MODIFICATION DATES of the posts</option>
+      <option value="0"><?php echo __('use CREATION DATES of the posts', 'order-your-posts-manually'); ?></option>
+      <option value="1"><?php echo __('use MODIFICATION DATES of the posts', 'order-your-posts-manually'); ?></option>
     </select>
     <script type="text/javascript">
-	jQuery("#opm_date_field").val(<?php echo $opm_date_field; ?>);
+	$("#opm_date_field").val(<?php echo $opm_date_field; ?>);
 	</script><br />
     <br />
-    <p><strong>Number of posts to show per page:</strong></p>
+    <p><strong><?php echo __('Number of posts to show per page', 'order-your-posts-manually'); ?>:</strong></p>
     <select name="opm_posts_per_page" id="opm_posts_per_page">
-      <option value="0">show ALL posts at once</option>
+      <option value="0"><?php echo __('show ALL posts at once', 'order-your-posts-manually'); ?></option>
       <option value="10">10</option>
       <option value="25">25</option>
       <option value="50">50</option>
@@ -442,11 +459,11 @@ function opm_options_page()
       <option value="500">500</option>
     </select>
     <script type="text/javascript">
-	jQuery("#opm_posts_per_page").val(<?php echo $opm_posts_per_page; ?>);
+	$("#opm_posts_per_page").val('<?php echo $opm_posts_per_page; ?>');
 	</script><br />
     <br />
     <br />
-    <input name="submit" type="submit" value="SAVE OPTIONS" class="button-primary button-large" />
+    <input name="submit" type="submit" value="<?php echo __('SAVE OPTIONS', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
   </form>
 </div>
 <?php

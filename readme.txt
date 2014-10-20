@@ -1,15 +1,15 @@
-=== Order your Posts Manually ===
+=== Order Your Posts Manually ===
 Contributors: CAGE Web Design | Rolf van Gelder
 Donate link: http://cagewebdev.com
-Plugin Name: Order your Posts Manually
+Plugin Name: Order Your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually/
 Tags: database, post, posts, order, manually, infinite scroll
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
 Tested up to: 4.0
-Stable tag: 1.4.1
-Version: 1.4.1
+Stable tag: 1.5
+Version: 1.5
 License: GPLv2 or later
 
 == Description ==
@@ -21,24 +21,29 @@ Start the plugin via: WP Admin Panel &raquo; Tools &raquo; Order Posts Manually<
 Drag and drop your posts in the order you like!
 
 WARNING:
-Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.
+Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.<br />
 It will swap some of the dates.<br />
 So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON'T USE THIS PLUGIN!
 
 = Author =
-CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands - http://cagewebdev.com - http://cage.nl
+CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands - http://cagewebdev.com - http://rvg.cage.nl
 
 = Plugin URL =
 http://cagewebdev.com/order-posts-manually/
 
 = Download URL =
-http://wordpress.org/extend/plugins/order-your-posts-manually/
+http://wordpress.org/plugins/order-your-posts-manually/
+
+= Currently supported languages =
+* English [en_US] (default, translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
+* Dutch   [nl_NL] (translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
+* Serbian [sr_RS] (translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com/)
 
 = Other WordPress plugins by Rolf van Gelder =
-Optimize Database after Deleting Revisions:<br />
-http://wordpress.org/plugins/rvg-optimize-database/<br />
-Rocket Reader (Speed reader):<br />
-http://wordpress.org/plugins/rocket-reader-speed-reader/
+<em>Optimize Database after Deleting Revisions</em><br />
+https://wordpress.org/plugins/rvg-optimize-database/<br />
+<em>Rocket Reader (Speed reader)</em><br />
+https://wordpress.org/plugins/rocket-reader-speed-reader/
 
 = Disclaimer =
 NO WARRANTY, USE AT OWN RISK!
@@ -49,6 +54,13 @@ NO WARRANTY, USE AT OWN RISK!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+
+= 1.5 [10/20/2014] =
+* NEW: plugin has been fully localized
+* NEW: dutch language support [nl_NL] added
+* NEW: serbian language support [sr_RS] added
+* NEW: spanish language support [es_ES] added
+* CHANGE: some bug fixes
 
 = 1.4.1 [09/06/2014] =
 * CHANGE: many changes and bug fixes
