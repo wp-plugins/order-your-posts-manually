@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.5';
-$opm_release_date = '10/20/2014';
+$opm_version      = '1.6';
+$opm_release_date = '10/22/2014';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.5
-Date: 10/20/2014
+Version: 1.6
+Date: 10/22/2014
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPLv2 or later
@@ -15,14 +15,14 @@ License: GPLv2 or later
 <?php
 /********************************************************************************************
 
-	ADD THE LANGUAGE SUPPORT (LOCALIZATION)
+	REGISTER TEXT DOMAIN FOR LANGUAGE SUPPORT (LOCALIZATION)
 
 *********************************************************************************************/
 function opm_action_init()
 {
 	// TEXT DOMAIN
 	load_plugin_textdomain('order-your-posts-manually', false, dirname(plugin_basename(__FILE__)));
-}
+} // opm_action_init()
 
 // INIT HOOK
 add_action('init', 'opm_action_init');
@@ -73,6 +73,10 @@ function opm_list_posts()
 	
 	// DEFAULT: ALL POSTS AT ONCE
 	if(!$opm_posts_per_page) $opm_posts_per_page = 0;
+	
+	// TYPES TO ORDER, DEFAULT = POST
+	$opm_post_type = get_option('opm_post_type');
+	if(!$opm_post_type) $opm_post_type = 'post';
 
 	/*************************************************************************
 	*
@@ -192,9 +196,11 @@ function opm_get_posts()
 {
 	if(done) return;
 	
+	// PARAMETERS FOR THE AJAX CALL
 	var data = {
 		'action': 'my_action',
 		'opm_posts_per_page': <?php echo $opm_posts_per_page;?>,
+		'opm_post_type': '<?php echo $opm_post_type;?>',
 		'nr_of_stickies': <?php echo $nr_of_stickies;?>,
 		'nr_of_posts': <?php echo $nr_of_posts;?>,	// EXCL. STICKIES
 		'pagnr': pagnr,
@@ -203,10 +209,10 @@ function opm_get_posts()
 
 	// <ajaxurl> IS DEFINED SINCE WP v2.8!
 	jQuery.post(ajaxurl, data, function(response) {
-		$("#sortable").append(response);
+		jQuery("#sortable").append(response);
 		pagnr++;
 		busy = false;
-		$("#loading").hide();
+		jQuery("#loading").hide();
 	});
 	
 	var end = ((pagnr-1)*<?php echo $opm_posts_per_page;?>)+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
@@ -219,13 +225,13 @@ function opm_get_posts()
  *	INITIALIZE JQUERY
  *
  ************************************************************************************/
-$(document).ready(function ()
+jQuery(document).ready(function ()
 {	// TAKE CARE OF THE DRAGGING AND DROPPING
-	$('#sortable').sortable({
+	jQuery('#sortable').sortable({
 			placeholder: 'placeholder',
 			stop: function (event, ui) {
-				var oData = $(this).sortable('serialize');
-				$('#sortdata').val(oData);
+				var oData = jQuery(this).sortable('serialize');
+				jQuery('#sortdata').val(oData);
 			}
 	});
 	// GET NEXT SET OF POSTS
@@ -238,10 +244,10 @@ $(document).ready(function ()
  *	CHECK IF WE ARE AT THE END OF THE PAGE
  *
  ************************************************************************************/
-$(window).scroll(function()
-{	if(!busy && !done && ($(window).scrollTop() + $(window).height() == $(document).height()))
+jQuery(window).scroll(function()
+{	if(!busy && !done && (jQuery(window).scrollTop() + jQuery(window).height() == jQuery(document).height()))
 	{	busy = true;
-		$("#loading").show();
+		jQuery("#loading").show();
 		// GET NEXT SET OF POSTS
 		opm_get_posts();
 	}
@@ -261,9 +267,8 @@ $(window).scroll(function()
   <br />
   <div id="post_table" style="margin:20px;">
     <h1>Order your Posts Manually - v<?php echo $opm_version;?> (<?php echo __('sort type', 'order-your-posts-manually'); ?>: <?php echo $mode; ?>)</h1>
-    <p>
-    <?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
-    <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
+    <p> <?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
+      <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
     </p>
     <p><strong><br />
       <?php echo __('WARNING', 'order-your-posts-manually'); ?>:<br />
@@ -317,7 +322,14 @@ $(window).scroll(function()
     <ul id="sortable">
     </ul>
     <br />
-    <div id="loading" style="display:none;" align="center"><img src="<?php echo $loader_image;?>" /><br />
+    <?php
+	/*************************************************************************
+	*
+	*	LOADING ANIMATION
+	*
+	*************************************************************************/	
+	?>
+    <div id="loading" style="display:block;" align="center"><img src="<?php echo $loader_image;?>" /><br />
       <br />
       <br />
     </div>
@@ -342,18 +354,17 @@ $(window).scroll(function()
 	AJAX SERVER FOR RETRIEVING SETS OF POSTS
 
 *********************************************************************************************/
-add_action( 'wp_ajax_my_action', 'my_action_callback' );
-
-function my_action_callback()
+function opm_action_callback()
 {
 	global $wpdb;
 
 	// GET THE PARAMETERS
-	$pagnr                = intval($_POST['pagnr']);
-	$opm_posts_per_page   = intval($_POST['opm_posts_per_page']);
-	$nr_of_stickies       = intval($_POST['nr_of_stickies']);
-	$nr_of_posts          = intval($_POST['nr_of_posts']);
-	$field_name           = $_POST['field_name'];
+	$pagnr              = intval($_POST['pagnr']);
+	$opm_posts_per_page = intval($_POST['opm_posts_per_page']);
+	$opm_post_type      = $_POST['opm_post_type'];	
+	$nr_of_stickies     = intval($_POST['nr_of_stickies']);
+	$nr_of_posts        = intval($_POST['nr_of_posts']);
+	$field_name         = $_POST['field_name'];
 
 	if($opm_posts_per_page > 0)
 	{	// LIMITED NUMBER OF POSTS PER PAGE
@@ -368,25 +379,33 @@ function my_action_callback()
 	}
 
 	$args    = array( 'posts_per_page' => 999999, 'orderby' => $field_name );
-    $myposts = get_posts( array( 'post__not_in' => get_option( 'sticky_posts' ), 'posts_per_page' => 999999, 'orderby' => $field_name ) );
+    $myposts = get_posts( array( 'post_type' => $opm_post_type, 'post__not_in' => get_option( 'sticky_posts' ), 'posts_per_page' => 999999, 'orderby' => $field_name ) );
 	
-	// COLLECT THE POSTS
-	$posts = '';
-	for($i=$start; $i<$end; $i++)
+	if (count($myposts) < 1)
 	{
-		if($field_name == 'post_date')
-			$this_date = $myposts[$i]->post_date;
-		else
-			$this_date = $myposts[$i]->post_modified;
-		$posts .= '<li id="post-id-'.$myposts[$i]->ID.'" class="ui-state-default" title="Post ID: '.$myposts[$i]->ID.'"><small>'.$this_date.'</small> * <strong>'.$myposts[$i]->post_title.'</strong></li>';
+		_e('No '.$post_type.'s found', 'order-your-posts-manually');
 	}
+	else
+	{
+		// COLLECT THE POSTS
+		$posts = '';
+		for($i=$start; $i<$end; $i++)
+		{
+			if($field_name == 'post_date')
+				$this_date = $myposts[$i]->post_date;
+			else
+				$this_date = $myposts[$i]->post_modified;
+			$posts .= '<li id="post-id-'.$myposts[$i]->ID.'" class="ui-state-default" title="Post ID: '.$myposts[$i]->ID.'"><small>'.$this_date.'</small> * <strong>'.$myposts[$i]->post_title.'</strong></li>';
+		}
 
-	// RETURN THE SET OF POSTS TO THE CALLER
-	echo $posts;
+		// RETURN THE SET OF POSTS TO THE CALLER
+		echo $posts;
+	}
 
 	// NEEDED FOR AN AJAX SERVER
 	die();
-}
+} // opm_action_callback()
+add_action( 'wp_ajax_my_action', 'opm_action_callback' );
 
 
 /********************************************************************************************
@@ -402,6 +421,7 @@ function opm_options_page()
 	{
 		update_option('opm_date_field', $_REQUEST['opm_date_field']);
 		update_option('opm_posts_per_page', $_REQUEST['opm_posts_per_page']);
+		update_option('opm_post_type', $_REQUEST['opm_post_type']);
 		echo "<div class='updated'><p><strong>".__('Order Your Posts Manually OPTIONS UPDATED!','order-your-posts-manually')."</strong></p></div>";
 	}
 
@@ -410,6 +430,9 @@ function opm_options_page()
 	
 	$opm_posts_per_page = get_option('opm_posts_per_page');
 	if(!$opm_posts_per_page) $opm_posts_per_page = '0';	// ALL posts (default)
+	
+	$opm_post_type = get_option('opm_post_type');
+	if(!$opm_post_type) $opm_post_type = 'post';
 ?>
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <style type="text/css">
@@ -434,7 +457,9 @@ function opm_options_page()
   <p><strong><?php echo __('WARNING','order-your-posts-manually');?>:<br />
     <?php echo __('Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.', 'order-your-posts-manually'); ?><br />
     <?php echo __('It will swap some of the dates.', 'order-your-posts-manually'); ?><br />
-    <?php echo __('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></strong></p></strong></p>
+    <?php echo __('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></strong></p>
+  </strong>
+  </p>
   <p><?php echo __('Per default WordPress orders the posts using the <strong>CREATION date</strong> (also known as \'<strong>post_date</strong>\'). Last created posts first.','order-your-posts-manually');?></p>
   <p><?php echo __('Some site designers (including myself) prefer the ordering of the posts using the <strong>MODIFICATION date</strong> (go to <a href="http://web20bp.com/kb/wordpress-sort-posts-on-modified-date/" target="_blank">this page</a> to see how to do that).<br />So, last modified posts will show up first.', 'order-your-posts-manually'); ?></p>
   <p><?php echo __('If you belong to the second category (<strong>MODIFICATION date</strong>) select the second option in the drop down box below!', 'order-your-posts-manually'); ?></p>
@@ -445,7 +470,7 @@ function opm_options_page()
       <option value="1"><?php echo __('use MODIFICATION DATES of the posts', 'order-your-posts-manually'); ?></option>
     </select>
     <script type="text/javascript">
-	$("#opm_date_field").val(<?php echo $opm_date_field; ?>);
+	jQuery("#opm_date_field").val(<?php echo $opm_date_field; ?>);
 	</script><br />
     <br />
     <p><strong><?php echo __('Number of posts to show per page', 'order-your-posts-manually'); ?>:</strong></p>
@@ -459,8 +484,12 @@ function opm_options_page()
       <option value="500">500</option>
     </select>
     <script type="text/javascript">
-	$("#opm_posts_per_page").val('<?php echo $opm_posts_per_page; ?>');
+	jQuery("#opm_posts_per_page").val('<?php echo $opm_posts_per_page; ?>');
 	</script><br />
+    <br />
+    <p><strong><?php echo __('Post type to show (default: \'post\')', 'order-your-posts-manually'); ?>:</strong></p>
+    <input name="opm_post_type" id="opm_post_type" type="text" value="<?php echo $opm_post_type?>" size="20" />
+    <br />
     <br />
     <br />
     <input name="submit" type="submit" value="<?php echo __('SAVE OPTIONS', 'order-your-posts-manually'); ?>" class="button-primary button-large" />

@@ -8,8 +8,8 @@ Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
 Tested up to: 4.0
-Stable tag: 1.5
-Version: 1.5
+Stable tag: 1.6
+Version: 1.6
 License: GPLv2 or later
 
 == Description ==
@@ -37,7 +37,8 @@ http://wordpress.org/plugins/order-your-posts-manually/
 = Currently supported languages =
 * English [en_US] (default, translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
 * Dutch   [nl_NL] (translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
-* Serbian [sr_RS] (translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com/)
+* Serbian [sr_RS] (translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com)
+* Spanish [es-ES] (translated by Andrew Kurtis, Web Hosting Hub - http://www.webhostinghub.com)
 
 = Other WordPress plugins by Rolf van Gelder =
 <em>Optimize Database after Deleting Revisions</em><br />
@@ -55,7 +56,10 @@ NO WARRANTY, USE AT OWN RISK!
 
 == Changelog ==
 
-= 1.5 [10/20/2014] =
+= 1.6 [10/22/2014] =
+* NEW: custom post type support for ordering (default: post)
+
+= 1.5.1 [10/20/2014] =
 * NEW: plugin has been fully localized
 * NEW: dutch language support [nl_NL] added
 * NEW: serbian language support [sr_RS] added
