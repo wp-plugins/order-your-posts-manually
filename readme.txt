@@ -35,10 +35,10 @@ http://cagewebdev.com/order-posts-manually/
 http://wordpress.org/plugins/order-your-posts-manually/
 
 = Currently supported languages =
-* English [en_US] (default, translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
-* Dutch   [nl_NL] (translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com)
-* Serbian [sr_RS] (translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com)
-* Spanish [es-ES] (translated by Andrew Kurtis, Web Hosting Hub - http://www.webhostinghub.com)
+* English [en_US] default, translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com
+* Dutch   [nl_NL] translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com
+* Serbian [sr_RS] translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com
+* Spanish [es-ES] translated by Andrew Kurtis, Web Hosting Hub - http://www.webhostinghub.com
 
 = Other WordPress plugins by Rolf van Gelder =
 <em>Optimize Database after Deleting Revisions</em><br />
