@@ -7,7 +7,7 @@ Tags: database, post, posts, order, manually, infinite scroll
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: 1.6
 Version: 1.6
 License: GPLv2 or later
