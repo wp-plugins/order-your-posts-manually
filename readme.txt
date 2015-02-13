@@ -40,15 +40,9 @@ http://wordpress.org/plugins/order-your-posts-manually/
 * Serbian [sr_RS] translated by Borisa Djuraskovic, Web Hosting Hub - http://www.webhostinghub.com
 * Spanish [es-ES] translated by Andrew Kurtis, Web Hosting Hub - http://www.webhostinghub.com
 
-= Plugins by Rolf van Gelder =
-<em>Optimize Database after Deleting Revisions</em><br />
-http://wordpress.org/plugins/rvg-optimize-database/<br />
-<em>Rocket Reader (Speed reader)</em><br />
-http://wordpress.org/plugins/rocket-reader-speed-reader/<br />
-<em>Order your Posts Manually</em><br />
-http://wordpress.org/plugins/order-your-posts-manually/<br />
-<em>Float to Top Button</em><br />
-http://wordpress.org/plugins/float-to-top-button/
+= Plugins by CAGE Web Design | Rolf van Gelder =
+WordPress plugins created by CAGE Web Design | Rolf van Gelder<br />
+http://cagewebdev.com/index.php/wordpress-plugins/
 
 = Disclaimer =
 NO WARRANTY, USE AT OWN RISK!
