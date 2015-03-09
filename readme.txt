@@ -8,8 +8,8 @@ Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
 Tested up to: 4.1.1
-Stable tag: 1.6
-Version: 1.6
+Stable tag: 1.7
+Version: 1.7
 License: GPLv2 or later
 
 == Description ==
@@ -53,6 +53,13 @@ NO WARRANTY, USE AT OWN RISK!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+
+= 1.7 [09/03/2015] =
+* NEW: filter posts on a category (optional)
+* CHANGE: languages moved to the 'languages' directory
+* CHANGE: stylesheet moved to the 'css' directory
+* CHANGE: javascript moved to the 'js' directory
+* CHANGE: several minor updates and improvements
 
 = 1.6 [10/22/2014] =
 * NEW: custom post type support for ordering (default: post)
