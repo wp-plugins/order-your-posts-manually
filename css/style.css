@@ -32,6 +32,7 @@
 .ui-state-default {
 	border: solid 1px #663366;
 	background-color: #FFF;
+	overflow: hidden;
 }
 .placeholder {
 	border: dashed 1px #FF0000;
