@@ -54,7 +54,7 @@ NO WARRANTY, USE AT OWN RISK!
 
 == Changelog ==
 
-= 1.7 [09/03/2015] =
+= 1.7 [03/09/2015] =
 * NEW: filter posts on a category (optional)
 * CHANGE: languages moved to the 'languages' directory
 * CHANGE: stylesheet moved to the 'css' directory
