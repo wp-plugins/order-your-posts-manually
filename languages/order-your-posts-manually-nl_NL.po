@@ -1,21 +1,22 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Order Your Posts Manually v1.5\n"
-"POT-Creation-Date: 2014-10-22 14:19+0100\n"
-"PO-Revision-Date: 2014-10-22 14:19+0100\n"
-"Last-Translator: Rolf van Gelder <info@cagewebdevc.com>\n"
+"POT-Creation-Date: 2015-03-09 22:10+0100\n"
+"PO-Revision-Date: 2015-03-09 22:10+0100\n"
+"Last-Translator: Rolf van Gelder <info@cagewebdev.com>\n"
 "Language-Team: CAGE Web Design <info@cagewebdev.com>\n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.10\n"
-"X-Poedit-Basepath: .\n"
+"X-Generator: Poedit 1.7.4\n"
+"X-Poedit-Basepath: C:\\Rolf\\ibs_wp\\wp-content\\plugins\\order-your-posts-"
+"manually\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: order-your-posts-manually.php:38 order-your-posts-manually.php:439
+#: order-your-posts-manually.php:38 order-your-posts-manually.php:470
 msgid "Order Your Posts Manually"
 msgstr "Order Your Posts Manually"
 
@@ -23,39 +24,39 @@ msgstr "Order Your Posts Manually"
 msgid "Order Your Posts Manually Options"
 msgstr "Order Your Posts Manually Opties"
 
-#: order-your-posts-manually.php:97
+#: order-your-posts-manually.php:109
 msgid "SORT ORDER SAVED!"
 msgstr "PRESENTATIEVOLGORDE OPGESLAGEN!"
 
-#: order-your-posts-manually.php:131
+#: order-your-posts-manually.php:157
 msgid "creation date"
 msgstr "creatiedatum"
 
-#: order-your-posts-manually.php:136
+#: order-your-posts-manually.php:162
 msgid "modification date"
 msgstr "wijzigingsdatum"
 
-#: order-your-posts-manually.php:267
+#: order-your-posts-manually.php:264
 msgid "sort type"
 msgstr "type sortering"
 
-#: order-your-posts-manually.php:268 order-your-posts-manually.php:442
+#: order-your-posts-manually.php:265 order-your-posts-manually.php:473
 msgid "Version"
 msgstr "Versie"
 
-#: order-your-posts-manually.php:269 order-your-posts-manually.php:443
+#: order-your-posts-manually.php:266 order-your-posts-manually.php:474
 msgid "Author"
 msgstr "Auteur"
 
-#: order-your-posts-manually.php:269 order-your-posts-manually.php:443
+#: order-your-posts-manually.php:266 order-your-posts-manually.php:474
 msgid "The Netherlands"
 msgstr "Nederland"
 
-#: order-your-posts-manually.php:272 order-your-posts-manually.php:451
+#: order-your-posts-manually.php:269 order-your-posts-manually.php:482
 msgid "WARNING"
 msgstr "WAARSCHUWING"
 
-#: order-your-posts-manually.php:273 order-your-posts-manually.php:452
+#: order-your-posts-manually.php:270 order-your-posts-manually.php:483
 msgid ""
 "Running this plugin will actually change the CREATION- or MODIFICATION dates "
 "of your posts in the database, to change the display order."
@@ -64,11 +65,11 @@ msgstr ""
 "berichten in de database gewijzigd, om de presentatievolgorde te kunnen "
 "aanpassen."
 
-#: order-your-posts-manually.php:274 order-your-posts-manually.php:453
+#: order-your-posts-manually.php:271 order-your-posts-manually.php:484
 msgid "It will swap some of the dates."
 msgstr "Sommige data zullen verwisseld worden."
 
-#: order-your-posts-manually.php:275 order-your-posts-manually.php:454
+#: order-your-posts-manually.php:272 order-your-posts-manually.php:485
 msgid ""
 "So, if you think the EXACT DATES of when a post was created and / or "
 "modified are more important than the order of the posts: DON'T USE THIS "
@@ -77,19 +78,19 @@ msgstr ""
 "Dus, als u de EXACTE DATA van de berichten belangrijker vindt dan de "
 "VOLGORDE van de berichten: GEBRUIK DEZE PLUGIN DAN NIET!"
 
-#: order-your-posts-manually.php:277
+#: order-your-posts-manually.php:274
 msgid "STICKY POSTS"
 msgstr "'STICKY' BERICHTEN"
 
-#: order-your-posts-manually.php:302
+#: order-your-posts-manually.php:298
 msgid "REGULAR POSTS"
 msgstr "NORMALE BERICHTEN"
 
-#: order-your-posts-manually.php:304
+#: order-your-posts-manually.php:300
 msgid "Drag and drop the posts to change the display order!"
 msgstr "Drag en drop de berichten om de presentatievolgorde te wijzigen!"
 
-#: order-your-posts-manually.php:305
+#: order-your-posts-manually.php:301
 msgid ""
 "After changing the order, don't forget to click the <strong>SAVE CHANGES</"
 "strong> button to actually update the posts"
@@ -97,23 +98,31 @@ msgstr ""
 "Vergeet niet de <strong>BEWAAR WIJZIGINGEN</strong>-knop te klikken om de "
 "wijzigingen daadwerkelijk op te slaan"
 
-#: order-your-posts-manually.php:307 order-your-posts-manually.php:334
+#: order-your-posts-manually.php:303
+msgid "Category"
+msgstr "Categorie"
+
+#: order-your-posts-manually.php:304
+msgid "* ALL *"
+msgstr "* ALLE *"
+
+#: order-your-posts-manually.php:321 order-your-posts-manually.php:355
 msgid "SAVE CHANGES"
 msgstr "BEWAAR WIJZIGINGEN"
 
-#: order-your-posts-manually.php:309 order-your-posts-manually.php:336
+#: order-your-posts-manually.php:323 order-your-posts-manually.php:357
 msgid "RELOAD POSTS"
 msgstr "BERICHTEN HERLADEN"
 
-#: order-your-posts-manually.php:381
+#: order-your-posts-manually.php:416
 msgid "No "
 msgstr "Geen"
 
-#: order-your-posts-manually.php:419
+#: order-your-posts-manually.php:455
 msgid "Order Your Posts Manually OPTIONS UPDATED!"
 msgstr "Order Your Posts Manually OPTIES AANGEPAST!"
 
-#: order-your-posts-manually.php:440
+#: order-your-posts-manually.php:471
 msgid ""
 "With this plugin your visually can change the order of the posts for when "
 "they will be displayed"
@@ -121,23 +130,23 @@ msgstr ""
 "Met behulp van deze plugin kunt u op een visuele manier de "
 "presentatievolgorde van de berichten aanpassen"
 
-#: order-your-posts-manually.php:444
+#: order-your-posts-manually.php:475
 msgid "Website"
 msgstr "Website"
 
-#: order-your-posts-manually.php:445
+#: order-your-posts-manually.php:476
 msgid "Plugin page"
 msgstr "Plugin pagina"
 
-#: order-your-posts-manually.php:446
+#: order-your-posts-manually.php:477
 msgid "Download page"
 msgstr "Download pagina"
 
-#: order-your-posts-manually.php:450
+#: order-your-posts-manually.php:481
 msgid "Order Your Posts Manually - Options"
 msgstr "Order Your Posts Manually - Opties"
 
-#: order-your-posts-manually.php:457
+#: order-your-posts-manually.php:488
 msgid ""
 "Per default WordPress orders the posts using the <strong>CREATION date</"
 "strong> (also known as '<strong>post_date</strong>'). Last created posts "
@@ -147,7 +156,7 @@ msgstr ""
 "(ook bekend als '<strong>post_date</strong>'). Het laatst toegevoegde "
 "bericht wordt dus als eerste getoond."
 
-#: order-your-posts-manually.php:458
+#: order-your-posts-manually.php:489
 msgid ""
 "Some site designers (including myself) prefer the ordering of the posts "
 "using the <strong>MODIFICATION date</strong> (go to <a href=\"http://web20bp."
@@ -160,7 +169,7 @@ msgstr ""
 "\">hier</a> om te zien hoe u dat kunt doen)<br />Dus, de laatst gewijzigde "
 "berichten verschijnen bovenaan."
 
-#: order-your-posts-manually.php:459
+#: order-your-posts-manually.php:490
 msgid ""
 "If you belong to the second category (<strong>MODIFICATION date</strong>) "
 "select the second option in the drop down box below!"
@@ -168,27 +177,27 @@ msgstr ""
 "Als u behoort tot de tweede categorie (<strong>WIJZIGINGSDATUM</strong>) "
 "selecteer hieronder dan de tweede optie."
 
-#: order-your-posts-manually.php:463
+#: order-your-posts-manually.php:494
 msgid "use CREATION DATES of the posts"
 msgstr "gebruik de CREATIEDATA van de berichten"
 
-#: order-your-posts-manually.php:464
+#: order-your-posts-manually.php:495
 msgid "use MODIFICATION DATES of the posts"
 msgstr "gebruik de WIJZIGINGSDATA van de berichten"
 
-#: order-your-posts-manually.php:470
+#: order-your-posts-manually.php:501
 msgid "Number of posts to show per page"
 msgstr "Aantal berichten dat per pagina getoond moet worden"
 
-#: order-your-posts-manually.php:472
+#: order-your-posts-manually.php:503
 msgid "show ALL posts at once"
 msgstr "toon ALLE beschikbare berichten"
 
-#: order-your-posts-manually.php:484
+#: order-your-posts-manually.php:515
 msgid "Post type to show (default: 'post')"
 msgstr "Te tonen post type (standaard: 'post')"
 
-#: order-your-posts-manually.php:489
+#: order-your-posts-manually.php:520
 msgid "SAVE OPTIONS"
 msgstr "BEWAAR OPTIES"
 

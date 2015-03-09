@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.6';
-$opm_release_date = '10/22/2014';
+$opm_version      = '1.7';
+$opm_release_date = '03/09/2015';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.6
-Date: 10/22/2014
+Version: 1.7
+Date: 03/09/2015
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPLv2 or later
@@ -21,7 +21,7 @@ License: GPLv2 or later
 function opm_action_init()
 {
 	// TEXT DOMAIN
-	load_plugin_textdomain('order-your-posts-manually', false, dirname(plugin_basename(__FILE__)));
+	load_plugin_textdomain('order-your-posts-manually', false, dirname(plugin_basename(__FILE__)).'/languages/');
 } // opm_action_init()
 
 // INIT HOOK
@@ -53,6 +53,29 @@ function opm_admin_menu()
     }
 } // opm_admin_menu()
 add_action( 'admin_menu', 'opm_admin_menu' );
+
+
+/********************************************************************************************
+
+	LOAD JAVASCRIPT
+
+*********************************************************************************************/
+function opm_scripts()
+{	wp_register_script( 'opm-jquery-ui', plugins_url('order-your-posts-manually/js/jquery-ui.min.js'), array('jquery'), '1.11.3', true);
+	wp_enqueue_script( 'opm-jquery-ui' );	
+} // opm_styles()
+add_action( 'admin_init', 'opm_scripts' );
+
+
+/********************************************************************************************
+
+	LOAD STYLE SHEET(S)
+
+*********************************************************************************************/
+function opm_styles()
+{	wp_enqueue_style ('opm-style', plugin_dir_url(__FILE__) . 'css/style.css',false,'1.0','all');
+} // opm_styles()
+add_action( 'admin_init', 'opm_styles' );
 
 
 /********************************************************************************************
@@ -104,7 +127,21 @@ function opm_list_posts()
 	*	GET THE POSTS
 	*
 	*************************************************************************/
-	$args    = array( 'posts_per_page' => 999999, 'orderby' => $field_name );
+	$cat_id = '0';
+	if(isset($_REQUEST['cat_id']) && $_REQUEST['cat_id'] > 0)
+	{	$cat_id = $_REQUEST['cat_id'];
+		$args = array(
+			'posts_per_page' => 999999,
+			'category' => $cat_id,
+			'orderby' => $field_name
+		);
+	}
+	else
+	{	$args = array(
+			'posts_per_page' => 999999,
+			'orderby' => $field_name
+		);
+	}
 	$myposts = get_posts($args);
 
 	$dates                = '';
@@ -139,49 +176,6 @@ function opm_list_posts()
 		} // if(is_sticky($post->ID))
 	} // foreach($myposts as $post)
 ?>
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-<style>
-#stickies {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
-#stickies li {
-	margin: 0 3px 10px 0px;
-	padding: 0.3em;
-	font-size: 1.1em;
-	height: 16px;
-}
-#sortable {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
-#sortable li {
-	margin: 0 3px 10px 0px;
-	padding: 0.3em;
-	font-size: 1.1em;
-	height: 16px;
-}
-#sortable li span {
-	position: absolute;
-	margin-left: -1.3em;
-}
-#sortable li:hover {
-	background-color: #FF0;
-}
-.ui-state-default {
-	border: solid 1px #663366;
-	background-color: #FFF;
-}
-.placeholder {
-	border: dashed 1px #FF0000;
-}
-small {
-	font-size: 0.9em;
-}
-</style>
 <script type="text/javascript">
 var pagnr = 1;
 var busy  = false;
@@ -199,6 +193,7 @@ function opm_get_posts()
 	// PARAMETERS FOR THE AJAX CALL
 	var data = {
 		'action': 'my_action',
+		'cat_id': <?php echo $cat_id;?>,
 		'opm_posts_per_page': <?php echo $opm_posts_per_page;?>,
 		'opm_post_type': '<?php echo $opm_post_type;?>',
 		'nr_of_stickies': <?php echo $nr_of_stickies;?>,
@@ -260,15 +255,23 @@ jQuery(window).scroll(function()
  *
  ************************************************************************************/
 ?>
+<script type="text/javascript">
+function opm_cat_id_onchange()
+{
+	var cat_id = jQuery("#opm_cat_id").val();
+	self.location = '<?php echo site_url().'/wp-admin/tools.php?page=opm-order-posts.php&cat_id='?>'+cat_id;
+}
+</script>
+
 <form action="" method="post">
   <input type="hidden" id="action" name="action" value="update_dates" />
   <input type="hidden" id="sortdata" name="sortdata" value="" />
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
   <br />
-  <div id="post_table" style="margin:20px;">
+  <div id="post-table">
     <h1>Order your Posts Manually - v<?php echo $opm_version;?> (<?php echo __('sort type', 'order-your-posts-manually'); ?>: <?php echo $mode; ?>)</h1>
     <p> <?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
-      <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
+      <?php echo __('Author', 'order-your-posts-manually'); ?>: <a href="http://rvg.cage.nl" target="_blank">Rolf van Gelder</a> - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
     </p>
     <p><strong><br />
       <?php echo __('WARNING', 'order-your-posts-manually'); ?>:<br />
@@ -296,7 +299,6 @@ jQuery(window).scroll(function()
       <li class="ui-state-default" title="Post ID: <?php echo $post->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $post->post_title?></strong></li>
       <?php
 		}
-		
 	} // foreach($myposts as $post)
 ?>
     </ul>
@@ -305,6 +307,30 @@ jQuery(window).scroll(function()
     <br />
     <strong><?php echo __('Drag and drop the posts to change the display order!', 'order-your-posts-manually'); ?></strong><br />
     (<?php echo __('After changing the order, don\'t forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts', 'order-your-posts-manually'); ?>)<br />
+    <br />
+    <?php _e('Category', 'order-your-posts-manually')?>
+    :
+    <select name="opm_cat_id" id="opm_cat_id" onchange="opm_cat_id_onchange();">
+      <option value="0">
+      <?php _e('* ALL *', 'order-your-posts-manually')?>
+      </option>
+      <?php
+	$args = array(
+	  'hide_empty' => 1,
+	  'orderby' => $field_name,
+	  'order' => 'ASC'
+	);
+	$cat_id = 0;
+	if(isset($_REQUEST['cat_id']) && $_REQUEST['cat_id'] > 0) $cat_id = $_REQUEST['cat_id'];
+	$categories = get_categories($args);
+	foreach ( $categories as $category )
+	{	$selected = '';
+		if($category->cat_ID == $cat_id) $selected = 'selected="selected"';
+		echo '<option value="'.$category->cat_ID.'" '.$selected.'>'.__($category->name, 'order-your-posts-manually').'</option>';
+	}
+?>
+    </select>
+    <br />
     <br />
     <input name="submit" type="submit" value="<?php echo __('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
@@ -317,7 +343,7 @@ jQuery(window).scroll(function()
 	*	PLACEHOLDER FOR THE ACTUAL POSTS
 	*
 	*************************************************************************/
-	$loader_image = plugins_url().'/order-your-posts-manually/loader.gif';
+	$loader_image = plugins_url().'/order-your-posts-manually/images/loader.gif';
 ?>
     <ul id="sortable">
     </ul>
@@ -329,7 +355,7 @@ jQuery(window).scroll(function()
 	*
 	*************************************************************************/	
 	?>
-    <div id="loading" style="display:block;" align="center"><img src="<?php echo $loader_image;?>" /><br />
+    <div id="loading" align="center"><img src="<?php echo $loader_image;?>" /><br />
       <br />
       <br />
     </div>
@@ -360,6 +386,7 @@ function opm_action_callback()
 
 	// GET THE PARAMETERS
 	$pagnr              = intval($_POST['pagnr']);
+	$cat_id             = $_POST['cat_id'];
 	$opm_posts_per_page = intval($_POST['opm_posts_per_page']);
 	$opm_post_type      = $_POST['opm_post_type'];	
 	$nr_of_stickies     = intval($_POST['nr_of_stickies']);
@@ -378,8 +405,25 @@ function opm_action_callback()
 		$end   = $nr_of_posts;
 	}
 
-	$args    = array( 'posts_per_page' => 999999, 'orderby' => $field_name );
-    $myposts = get_posts( array( 'post_type' => $opm_post_type, 'post__not_in' => get_option( 'sticky_posts' ), 'posts_per_page' => 999999, 'orderby' => $field_name ) );
+	if(isset($cat_id) && $cat_id > 0)
+	{
+		$myposts = get_posts( array(
+			'category' => $cat_id,
+			'post_type' => $opm_post_type,
+			'post__not_in' => get_option( 'sticky_posts' ),
+			'posts_per_page' => 999999,
+			'orderby' => $field_name
+		) );
+	}
+	else
+	{
+		$myposts = get_posts( array(
+			'post_type' => $opm_post_type,
+			'post__not_in' => get_option( 'sticky_posts' ),
+			'posts_per_page' => 999999,
+			'orderby' => $field_name
+		) );	
+	}
 	
 	if (count($myposts) < 1)
 	{
@@ -434,19 +478,14 @@ function opm_options_page()
 	$opm_post_type = get_option('opm_post_type');
 	if(!$opm_post_type) $opm_post_type = 'post';
 ?>
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<style type="text/css">
-#opm_options_form {
-	margin: 40px;
-}
-</style>
+<!--<script src="//code.jquery.com/jquery-1.10.2.js"></script>-->
 <div id="opm_options_form">
   <p>
   <h1><?php echo __('Order Your Posts Manually', 'order-your-posts-manually'); ?></h1>
   <em><strong><?php echo __('With this plugin your visually can change the order of the posts for when they will be displayed', 'order-your-posts-manually'); ?></strong></em>
   </p>
   <p><?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
-    <?php echo __('Author', 'order-your-posts-manually'); ?>: <strong>Rolf van Gelder - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
+    <?php echo __('Author', 'order-your-posts-manually'); ?>: <a href="http://rvg.cage.nl" target="_blank">Rolf van Gelder</a> - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
     <?php echo __('Website', 'order-your-posts-manually'); ?>: <a href="http://cagewebdev.com" target="_blank">http://cagewebdev.com</a><br />
     <?php echo __('Plugin page', 'order-your-posts-manually'); ?>: <a href="http://cagewebdev.com/order-posts-manually/" target="_blank">http://cagewebdev.com/order-posts-manually/</a><br />
     <?php echo __('Download page', 'order-your-posts-manually'); ?>: <a href="http://wordpress.org/plugins/order-your-posts-manually/" target="_blank">http://wordpress.org/plugins/order-your-posts-manually/</a></p>

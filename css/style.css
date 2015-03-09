@@ -1,0 +1,50 @@
+@charset "utf-8";
+/* CSS Document */
+#stickies {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#stickies li {
+	margin: 0 3px 10px 0px;
+	padding: 0.3em;
+	font-size: 1.1em;
+	height: 16px;
+}
+#sortable {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#sortable li {
+	margin: 0 3px 10px 0px;
+	padding: 0.3em;
+	font-size: 1.1em;
+	height: 16px;
+}
+#sortable li span {
+	position: absolute;
+	margin-left: -1.3em;
+}
+#sortable li:hover {
+	background-color: #FF0;
+}
+.ui-state-default {
+	border: solid 1px #663366;
+	background-color: #FFF;
+}
+.placeholder {
+	border: dashed 1px #FF0000;
+}
+small {
+	font-size: 0.9em;
+}
+#opm_options_form {
+	margin: 40px;
+}
+#post-table {
+	margin: 20px;
+}
+#loading {
+	display: block;
+}
