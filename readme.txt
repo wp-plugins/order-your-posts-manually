@@ -1,13 +1,13 @@
 === Order Your Posts Manually ===
 Contributors: CAGE Web Design | Rolf van Gelder
-Donate link: http://cagewebdev.com/index.php/donations/
+Donate link: http://cagewebdev.com/index.php/donations-opm/
 Plugin Name: Order Your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually/
 Tags: database, post, posts, order, manually, infinite scroll
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
-Tested up to: 4.2.1
+Tested up to: 4.2.2
 Stable tag: 1.7
 Version: 1.7
 License: GPLv2 or later
