@@ -1,12 +1,12 @@
 <?php
-$opm_version      = '1.7';
-$opm_release_date = '03/09/2015';
+$opm_version      = '1.7.1';
+$opm_release_date = '07/26/2015';
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.7
-Date: 03/09/2015
+Version: 1.7.1
+Date: 07/26/2015
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPLv2 or later
@@ -192,7 +192,7 @@ function opm_get_posts()
 	
 	// PARAMETERS FOR THE AJAX CALL
 	var data = {
-		'action': 'my_action',
+		'action': 'opm_action',	// v1.7.1
 		'cat_id': <?php echo $cat_id;?>,
 		'opm_posts_per_page': <?php echo $opm_posts_per_page;?>,
 		'opm_post_type': '<?php echo $opm_post_type;?>',
@@ -269,7 +269,7 @@ function opm_cat_id_onchange()
   <input type="hidden" id="dates" name="dates" value="<?php echo $dates;?>" />
   <br />
   <div id="post-table">
-    <h1>Order your Posts Manually - v<?php echo $opm_version;?> (<?php echo __('sort type', 'order-your-posts-manually'); ?>: <?php echo $mode; ?>)</h1>
+    <h1>Order your Posts Manually (<?php echo __('sort type', 'order-your-posts-manually'); ?>: <?php echo $mode; ?>)</h1>
     <p> <?php echo __('Version', 'order-your-posts-manually'); ?>: <strong>v<?php echo $opm_version; ?></strong> - <strong><?php echo $opm_release_date; ?></strong><br />
       <?php echo __('Author', 'order-your-posts-manually'); ?>: <a href="http://rvg.cage.nl" target="_blank">Rolf van Gelder</a> - <a href="http://cagewebdev.com" target="_blank">CAGE Web Design</a>, Eindhoven, <?php echo __('The Netherlands', 'order-your-posts-manually'); ?></strong><br>
     </p>
@@ -378,6 +378,8 @@ function opm_cat_id_onchange()
 /********************************************************************************************
 
 	AJAX SERVER FOR RETRIEVING SETS OF POSTS
+	
+	v1.7.1	bugs fixed
 
 *********************************************************************************************/
 function opm_action_callback()
@@ -385,6 +387,8 @@ function opm_action_callback()
 	global $wpdb;
 
 	// GET THE PARAMETERS
+	if(!isset($_POST['pagnr'])) wp_die();
+	
 	$pagnr              = intval($_POST['pagnr']);
 	$cat_id             = $_POST['cat_id'];
 	$opm_posts_per_page = intval($_POST['opm_posts_per_page']);
@@ -447,9 +451,9 @@ function opm_action_callback()
 	}
 
 	// NEEDED FOR AN AJAX SERVER
-	die();
+	wp_die();
 } // opm_action_callback()
-add_action( 'wp_ajax_my_action', 'opm_action_callback' );
+add_action( 'wp_ajax_opm_action', 'opm_action_callback' );
 
 
 /********************************************************************************************
