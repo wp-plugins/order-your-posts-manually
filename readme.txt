@@ -7,9 +7,9 @@ Tags: database, post, posts, order, manually, infinite scroll
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
-Tested up to: 4.2.2
-Stable tag: 1.7
-Version: 1.7
+Tested up to: 4.2.3
+Stable tag: 1.7.1
+Version: 1.7.1
 License: GPLv2 or later
 
 == Description ==
@@ -53,6 +53,8 @@ NO WARRANTY, USE AT OWN RISK!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+= 1.7.1 [07/26/2015] =
+* BUG FIX: bugs fixed for ajax calls
 
 = 1.7 [03/09/2015] =
 * NEW: filter posts on a category (optional)
