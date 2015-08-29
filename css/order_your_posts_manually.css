@@ -1,32 +1,38 @@
 @charset "utf-8";
-/* CSS Document */
-#stickies {
+small {
+	font-size: 0.9em;
+}
+.opm-normal {
+	font-weight: normal;
+}
+#opm-stickies {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
-#stickies li {
+#opm-stickies li {
 	margin: 0 3px 10px 0px;
 	padding: 0.3em;
 	font-size: 1.1em;
 	height: 16px;
 }
-#sortable {
+#opm-sortable {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
 }
-#sortable li {
+#opm-sortable li {
 	margin: 0 3px 10px 0px;
 	padding: 0.3em;
 	font-size: 1.1em;
 	height: 16px;
 }
-#sortable li span {
+#opm-sortable li span {
 	position: absolute;
 	margin-left: -1.3em;
 }
-#sortable li:hover {
+#opm-sortable li:hover {
 	background-color: #FF0;
 }
 .ui-state-default {
@@ -34,16 +40,13 @@
 	background-color: #FFF;
 	overflow: hidden;
 }
-.placeholder {
+.opm-placeholder {
 	border: dashed 1px #FF0000;
 }
-small {
-	font-size: 0.9em;
-}
-#post-table {
+#opm-post-table {
 	margin: 20px;
 }
-#loading {
+#opm-loading {
 	display: block;
 }
 /***********************************************************************
@@ -72,6 +75,10 @@ small {
 	width: 96%;
 	padding-left: 5px;
 	margin-bottom: 20px;
+}
+.opm-right-column {
+	padding-left: 50px;
+	padding-bottom: 8px;
 }
 #opm_settings input[type="text"] {
 	font-size: 13px;

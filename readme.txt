@@ -8,8 +8,8 @@ Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
 Tested up to: 4.3
-Stable tag: 1.7.2
-Version: 1.7.2
+Stable tag: 1.8
+Version: 1.8
 License: GPLv2 or later
 
 == Description ==
@@ -53,6 +53,10 @@ NO WARRANTY, USE AT OWN RISK!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+= 1.8 [08/29/2015] =
+* NEW: thumbnails of posts can be displayed in the list (optional, via settings)
+* CHANGE: total revamp of the code + many improvements
+
 = 1.7.2 [08/06/2015] =
 * CHANGE: made the role for running the plugin and changing the options the same ('manage_options')
 * CHANGE: added a link to the settings page on the main plugin page
