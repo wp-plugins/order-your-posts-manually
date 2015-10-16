@@ -7,9 +7,9 @@ Tags: database, post, posts, order, manually, infinite scroll
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
-Tested up to: 4.3
-Stable tag: 1.8
-Version: 1.8
+Tested up to: 4.3.1
+Stable tag: 1.9
+Version: 1.9
 License: GPLv2 or later
 
 == Description ==
@@ -53,6 +53,9 @@ NO WARRANTY, USE AT OWN RISK!
 * Activate the plugin in the WP Admin Panel &raquo; Plugins
 
 == Changelog ==
+= 1.9 [10/16/2015] =
+* NEW: sticky posts now also can be re-ordered
+
 = 1.8 [08/29/2015] =
 * NEW: thumbnails of posts can be displayed in the list (optional, via settings)
 * CHANGE: total revamp of the code + many improvements
