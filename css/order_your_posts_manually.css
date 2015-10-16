@@ -40,6 +40,9 @@ small {
 	background-color: #FFF;
 	overflow: hidden;
 }
+.opm-sticky {
+	background-color: #7ad03a;
+}
 .opm-placeholder {
 	border: dashed 1px #FF0000;
 }

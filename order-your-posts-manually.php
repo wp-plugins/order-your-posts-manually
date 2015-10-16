@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Order your Posts Manually
- * @version 1.8
+ * @version 1.9
  */
 /*
 Plugin Name: Order your Posts Manually
 Plugin URI: http://cagewebdev.com/order-posts-manually
 Description: Order your Posts Manually by Dragging and Dropping them
-Version: 1.8
-Date: 08/29/2015
+Version: 1.9
+Date: 10/16/2015
 Author: Rolf van Gelder
 Author URI: http://cagewebdev.com/
 License: GPLv2 or later
@@ -27,8 +27,8 @@ $opm_class = new OrderYourPostsManually;
  
 class OrderYourPostsManually
 {
-	var $opm_version      = '1.8';
-	var $opm_release_date = '08/29/2015';
+	var $opm_version      = '1.9';
+	var $opm_release_date = '10/16/2015';
 	
 	/*******************************************************************************
 	 * 	CONSTRUCTOR
@@ -251,25 +251,19 @@ class OrderYourPostsManually
 		 ************************************************************************************/
 		foreach($myposts as $post)
 		{
-			if(is_sticky($post->ID))
+			if(is_sticky($post->ID)) $nr_of_stickies++;
+			$nr_of_posts++;
+			if($dates) $dates .= "#";
+			if($field_name == 'post_date')
 			{
-				$nr_of_stickies++;
+				$dates .= $post->post_date;
+				$mode = __('creation date', 'order-your-posts-manually');
 			}
 			else
 			{
-				$nr_of_posts++;
-				if($dates) $dates .= "#";
-				if($field_name == 'post_date')
-				{
-					$dates .= $post->post_date;
-					$mode = __('creation date', 'order-your-posts-manually');
-				}
-				else
-				{
-					$dates .= $post->post_modified;
-					$mode = __('modification date', 'order-your-posts-manually');
-				}			
-			} // if(is_sticky($post->ID))
+				$dates .= $post->post_modified;
+				$mode = __('modification date', 'order-your-posts-manually');
+			}			
 		} // foreach($myposts as $post)
 	?>
 <script type="text/javascript">
@@ -295,7 +289,7 @@ class OrderYourPostsManually
 			'opm_show_thumbnails': '<?php echo $this->opm_options['opm_show_thumbnails']?>',
 			'opm_thumbnail_size': '<?php echo $this->opm_options['opm_thumbnail_size']?>',
 			'nr_of_stickies': <?php echo $nr_of_stickies;?>,
-			'nr_of_posts': <?php echo $nr_of_posts;?>,	// EXCL. STICKIES
+			'nr_of_posts': <?php echo $nr_of_posts;?>,	// INCL. STICKIES
 			'pagnr': pagnr,
 			'field_name': '<?php echo $field_name;?>'
 		};
@@ -308,7 +302,8 @@ class OrderYourPostsManually
 			jQuery("#opm-loading").hide();
 		});
 		
-		var end = ((pagnr-1)*<?php echo $opm_posts_per_page;?>)+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
+		var end = ((pagnr-1)*<?php echo $opm_posts_per_page;?>)+<?php echo $opm_posts_per_page;?>;
+		// 1.9 var end = ((pagnr-1)*<?php echo $opm_posts_per_page;?>)+<?php echo $nr_of_stickies;?>+<?php echo $opm_posts_per_page;?>;
 		if((end > <?php echo $nr_of_posts;?>) || (<?php echo $opm_posts_per_page;?> == 0)) done = true;
 	} // opm_get_posts()
 	
@@ -320,8 +315,9 @@ class OrderYourPostsManually
 	 ************************************************************************************/
 	jQuery(document).ready(function ()
 	{	// TAKE CARE OF THE DRAGGING AND DROPPING
+		// http://api.jqueryui.com/sortable/
 		jQuery('#opm-sortable').sortable({
-				placeholder: 'opm-placeholder',
+				placeholder: 'opm-placeholder',			
 				stop: function (event, ui) {
 					var oData = jQuery(this).sortable('serialize');
 					jQuery('#sortdata').val(oData);
@@ -382,39 +378,17 @@ function opm_cat_id_onchange()
       <?php _e( 'Author', 'order-your-posts-manually' ); ?></a> - <a href="http://cagewebdev.com/" target="_blank">
       <?php _e( 'Company', 'order-your-posts-manually' ); ?></a> - <a href="http://cagewebdev.com/index.php/donations-opm/" target="_blank">
       <?php _e( 'Donation page', 'order-your-posts-manually' ); ?></a></strong>
-      <p> <?php echo __('WARNING','order-your-posts-manually');?>:<br />
-        <?php echo __('Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.', 'order-your-posts-manually'); ?><br />
-        <?php echo __('It will swap some of the dates.', 'order-your-posts-manually'); ?><br />
-        <?php echo __('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></p>
+      <p> <?php _e('WARNING','order-your-posts-manually');?>:<br />
+        <?php _e('Running this plugin will actually change the CREATION- or MODIFICATION dates of your posts in the database, to change the display order.', 'order-your-posts-manually'); ?><br />
+        <?php _e('It will swap some of the dates.', 'order-your-posts-manually'); ?><br />
+        <?php _e('So, if you think the EXACT DATES of when a post was created and / or modified are more important than the order of the posts: DON\'T USE THIS PLUGIN!', 'order-your-posts-manually'); ?></p>
     </div>
-    <strong style="color:#00F;"><?php echo __('STICKY POSTS', 'order-your-posts-manually'); ?> (<?php echo $nr_of_stickies;?>):</strong><br />
+    <strong style="color:#00F;"><?php _e('STICKY POSTS','order-your-posts-manually')?> (<?php echo $nr_of_stickies?>) - <?php _e('REGULAR POSTS', 'order-your-posts-manually'); ?> (<?php echo ($nr_of_posts-$nr_of_stickies);?>):</strong><br />
     <br />
-    <ul id="opm-stickies">
-      <?php
-		/*************************************************************************
-		*
-		*	DISPLAY STICKIES
-		*
-		*************************************************************************/
-		foreach($myposts as $post)
-		{	if(is_sticky($post->ID))
-			{
-				if($field_name == 'post_date')
-					$this_date = $post->post_date;
-				else
-					$this_date = $post->post_modified;			
-	?>
-      <li class="ui-state-default" title="Post ID: <?php echo $post->ID?>"><small><?php echo $this_date?></small> * <strong><?php echo $post->post_title?></strong></li>
-      <?php
-			}
-		} // foreach($myposts as $post)
-	?>
-    </ul>
+    <strong><?php _e('Drag and drop the posts to change the display order.', 'order-your-posts-manually'); ?></strong>
     <br />
-    <strong style="color:#00F;"><?php echo __('REGULAR POSTS', 'order-your-posts-manually'); ?> (<?php echo $nr_of_posts;?>):</strong><br />
-    <br />
-    <strong><?php echo __('Drag and drop the posts to change the display order!', 'order-your-posts-manually'); ?></strong><br />
-    (<?php echo __('After changing the order, don\'t forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts', 'order-your-posts-manually'); ?>)<br />
+    <strong><?php _e('NOTE: STICKY POSTS will always stay on top!', 'order-your-posts-manually'); ?></strong><br /><br />
+    (<?php _e('After changing the order, don\'t forget to click the <strong>SAVE CHANGES</strong> button to actually update the posts', 'order-your-posts-manually'); ?>)<br />
     <br />
     <?php _e('Category', 'order-your-posts-manually')?>
     :
@@ -440,9 +414,9 @@ function opm_cat_id_onchange()
     </select>
     <br />
     <br />
-    <input name="submit" type="submit" value="<?php echo __('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
+    <input name="submit" type="submit" value="<?php _e('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="<?php echo __('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
+    <input name="cancel" value="<?php _e('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
     <br />
     <br />
     <?php    
@@ -474,9 +448,9 @@ function opm_cat_id_onchange()
 		*
 		*************************************************************************/
 	?>
-    <input name="submit" type="submit" value="<?php echo __('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
+    <input name="submit" type="submit" value="<?php _e('SAVE CHANGES', 'order-your-posts-manually'); ?>" class="button-primary button-large" />
     &nbsp;&nbsp;&nbsp;
-    <input name="cancel" value="<?php echo __('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
+    <input name="cancel" value="<?php _e('RELOAD POSTS', 'order-your-posts-manually'); ?>" type="button" onclick="self.location='';" class="button" />
   </div>
 </form>
 <?php
@@ -522,6 +496,61 @@ function opm_action_callback()
 		$end   = $nr_of_posts;
 	}
 
+	
+	/**************************************************************************************
+	 *
+	 *	STICKY POSTS
+	 *
+	 **************************************************************************************/
+	if(isset($cat_id) && $cat_id > 0)
+	{
+		$mystickies = get_posts( array(
+			'category' => $cat_id,
+			'post_type' => $opm_post_type,
+			'post__in' => get_option( 'sticky_posts' ),
+			'posts_per_page' => 999999,
+			'orderby' => $field_name
+		) );
+	}
+	else
+	{
+		$mystickies = get_posts( array(
+			'post_type' => $opm_post_type,
+			'post__in' => get_option( 'sticky_posts' ),
+			'posts_per_page' => 999999,
+			'orderby' => $field_name
+		) );	
+	}
+
+	if (count($mystickies) > 0)
+	{
+		// COLLECT THE STICKIES
+		$posts = '';
+		for($i=$start; $i<$nr_of_stickies ; $i++)
+		{
+			$thumb = wp_get_attachment_image_src(get_post_thumbnail_id($mystickies[$i]->ID), 'thumbnail');
+			$url = $thumb['0'];			
+			if($field_name == 'post_date')
+				$this_date = $mystickies[$i]->post_date;
+			else
+				$this_date = $mystickies[$i]->post_modified;
+			if($url && $opm_show_thumbnails == "Y")
+			{	$posts .= '<li id="post-id-'.$mystickies[$i]->ID.'" class="ui-state-default opm-sticky" style="height:'.$opm_thumbnail_size.'px;" title="Post ID: '.$mystickies[$i]->ID.'"><div class="opm-post-text" style="float:left"><small>'.$this_date.'</small><strong> * STICKY * '.$mystickies[$i]->post_title.'</strong></div><div class="opm-post-thumb" style="float:right"><img src="'.$url.'" width="'.$opm_thumbnail_size.'" height="'.$opm_thumbnail_size.'"></div></li>';
+			}
+			else
+			{	$posts .= '<li id="post-id-'.$mystickies[$i]->ID.'" class="ui-state-default opm-sticky" title="Post ID: '.$mystickies[$i]->ID.'"><small>'.$this_date.'</small><strong> * STICKY * '.$mystickies[$i]->post_title.'</strong></li>';
+			}
+		}
+
+		// RETURN THE SET OF POSTS TO THE CALLER
+		echo $posts;
+	}
+
+	/**************************************************************************************
+	 *
+	 *	REGULAR POSTS
+	 *
+	 **************************************************************************************/
 	if(isset($cat_id) && $cat_id > 0)
 	{
 		$myposts = get_posts( array(
@@ -550,7 +579,7 @@ function opm_action_callback()
 	{
 		// COLLECT THE POSTS
 		$posts = '';
-		for($i=$start; $i<$end; $i++)
+		for($i=$start; $i<$end-$nr_of_stickies; $i++)
 		{
 			$thumb = wp_get_attachment_image_src( get_post_thumbnail_id($myposts[$i]->ID), 'thumbnail' );
 			$url = $thumb['0'];			
